@@ -1,106 +1,143 @@
-# AutoCare — Sistema de Gestión de Taller Mecánico
+# 🔧 AutoCare — Sistema de Gestión de Taller Mecánico
 
-## Integrantes
+## 👥 Integrantes
+
 - Fernando Barra
 - Benjamín Montanares
 - Sebastián Saavedra
 
-## Descripción
-Sistema de microservicios para la gestión integral de un taller mecánico automotriz,
-desarrollado con Spring Boot 3, Eureka, API Gateway y bases de datos independientes por servicio.
+---
 
-## Microservicios
-| Servicio           | Puerto | Descripción                        |
-|--------------------|--------|------------------------------------|
-| eureka-server      | 8761   | Registro y descubrimiento de servicios |
-| api-gateway        | 8080   | Puerta de entrada única            |
-| fleet-service      | 8081   | Gestión de vehículos               |
-| customer-service   | 8082   | Gestión de clientes                |
-| booking-service    | 8083   | Citas y reservas                   |
-| checkin-service    | 8084   | Recepción de vehículos             |
-| workflow-service   | 8085   | Órdenes de trabajo                 |
-| estimation-service | 8086   | Cotizaciones de repuestos          |
-| spare-parts-service| 8087   | Gestión de repuestos               |
-| hr-service         | 8088   | Gestión de mecánicos               |
-| billing-service    | 8089   | Facturación                        |
-| crm-service        | 8090   | Interacciones con clientes         |
-| notification-service| 8091  | Notificaciones                     |
+## 📋 Descripción
 
-## Tecnologías
-- Java 21 + Spring Boot 3.5
-- Spring Cloud (Eureka, API Gateway)
-- JPA + Hibernate + MySQL
-- WebClient para comunicación entre servicios
-- Bean Validation (Jakarta)
+Sistema de microservicios para la gestión integral de un taller mecánico automotriz, desarrollado con **Spring Boot 3.5.14**, **Eureka**, **API Gateway** y bases de datos independientes por servicio. La arquitectura está diseñada con alta cohesión, utilizando **Java 21 Records** para la inmutabilidad de datos y **WebClient** para la comunicación interservicios.
 
-## Pasos para ejecutar
-1. Iniciar `eureka-server` (puerto 8761)
-2. Iniciar los microservicios en cualquier orden
-3. Iniciar `api-gateway` (puerto 8080)
-4. Verificar registro en Eureka: http://localhost:8761
-5. Probar endpoints a través del gateway: http://localhost:8080/api/...
+---
 
-## Comunicación entre microservicios
-- `booking-service` → consulta `fleet-service` (verificar vehículo) y `customer-service` (verificar cliente)
-- `billing-service` → consulta `estimation-service` (obtener cotizaciones aprobadas para calcular factura)
+## 🧩 Microservicios e Infraestructura
 
-## Reglas de Negocio — Módulo de Citas (`booking-service`)
+| Servicio                | Puerto | Descripción                                      |
+|-------------------------|--------|--------------------------------------------------|
+| `eureka-server`         | 8761   | Registro y descubrimiento de servicios           |
+| `api-gateway`           | 8080   | Puerta de entrada única y enrutamiento           |
+| `garage-service`        | 8081   | Gestión unificada de clientes y vehículos        |
+| `booking-service`       | 8082   | Agendamiento de citas y reservas                 |
+| `loyalty-service`       | 8083   | Sistema de puntos, niveles y recompensas         |
+| `workshop-service`      | 8084   | Núcleo de operaciones y órdenes de trabajo       |
+| `diagnostics-service`   | 8085   | Historial clínico, telemetría y códigos OBD2     |
+| `hr-service`            | 8086   | Gestión del personal y disponibilidad de mecánicos |
+| `inventory-service`     | 8087   | Control de stock y catálogo de repuestos         |
+| `analytics-service`     | 8088   | Observatorio de métricas y reportes financieros  |
+| `billing-service`       | 8089   | Emisión de facturas y control de pagos           |
+| `procurement-service`   | 8090   | Gestión de proveedores y órdenes de compra       |
 
-Esta sección documenta las reglas de negocio implementadas en `CitaService`.
+---
 
-### RN-01: Existencia del vehículo y cliente
-Antes de registrar una cita, el sistema verifica que el vehículo y el cliente existan
-consultando `fleet-service` y `customer-service` respectivamente.
-Si alguno no existe, la cita se rechaza con un error 400.
+## ⚙️ Tecnologías
 
-### RN-02: Duración estándar de una cita
-Cada cita tiene una duración fija de **60 minutos**.
-Este valor se usa para calcular el rango de tiempo ocupado al validar conflictos.
+- **Java 21 + Spring Boot 3.5.14** — Uso extensivo de Records
+- **Spring Cloud** — Eureka Discovery Client, API Gateway, LoadBalancer
+- **JPA + Hibernate + PostgreSQL** — Bases de datos aisladas por dominio con `ddl-auto: update`
+- **Spring WebFlux (WebClient)** — Comunicación síncrona entre servicios
+- **Bean Validation (Jakarta)**
+- **Lombok** — Reducción de código boilerplate
 
-### RN-03: Sin choques de horario por vehículo
-Un mismo vehículo no puede tener dos citas en estado `CONFIRMADA` o `EJECUTADA`
-cuyas ventanas de tiempo se solapen.
-Si se detecta un conflicto, la cita se rechaza con el mensaje:
-> "El vehículo ya tiene una cita en ese horario."
+---
 
-**Ejemplo:**
-- Cita existente: 10:00 – 11:00
-- Nueva cita a las 10:30 → **rechazada** (se solapa)
-- Nueva cita a las 11:00 → **aceptada** (sin solapamiento)
+## 🚀 Pasos para Ejecutar
 
-### RN-04: Límite diario de citas del taller
-El taller acepta un máximo de **20 citas por día calendario**.
-Si se alcanza el límite, nuevas solicitudes son rechazadas con:
-> "Se alcanzó el máximo de citas permitidas para este día."
+1. Asegurar que el motor de **PostgreSQL** esté corriendo (usuario: `postgres`, clave: `admin`).
+2. Crear las 10 bases de datos vacías en `psql`:
+   ```sql
+   CREATE DATABASE autocare_garage;
+   CREATE DATABASE autocare_inventory;
+   -- (etc.)
+   ```
+3. Iniciar `eureka-server` (puerto `8761`).
+4. Iniciar los microservicios de negocio — Hibernate forjará las tablas automáticamente.
+5. Iniciar `api-gateway` (puerto `8080`).
+6. Verificar el mapa estelar en Eureka: [http://localhost:8761](http://localhost:8761)
+7. Consumir los endpoints a través del Gateway:
+   - `http://localhost:8080/api/taller`
+   - `http://localhost:8080/api/garage/clientes`
 
-### RN-05: Transiciones de estado válidas
-El estado de una cita solo puede cambiar según las siguientes transiciones permitidas:
+---
 
-| Estado actual | Estados permitidos |
-|---------------|--------------------|
-| `CONFIRMADA`  | `CANCELADA`, `EJECUTADA` |
-| `CANCELADA`   | *(ninguno — estado final)* |
-| `EJECUTADA`   | *(ninguno — estado final)* |
+## 🔗 Comunicación entre Microservicios (WebClient)
 
-Cualquier intento de transición no permitida retorna error 400 con:
-> "Transición de estado inválida: [estado_actual] → [estado_nuevo]"
+| Origen              | Destino             | Propósito                                                                                     |
+|---------------------|---------------------|-----------------------------------------------------------------------------------------------|
+| `garage-service`    | `loyalty-service`   | Crea automáticamente una cuenta de puntos con saldo cero al registrar un nuevo cliente        |
+| `workshop-service`  | `inventory-service` | Descuenta el stock en tiempo real cuando un mecánico utiliza una pieza en una reparación      |
+| `analytics-service` | `billing-service`   | Obtiene la suma de ingresos efectivos al generar el reporte mensual                           |
+| `booking-service`   | `garage-service`    | Verifica la existencia del cliente y su vehículo mediante sus identificadores numéricos (`Long`) |
 
-### RN-06: Creación automática de Orden de Trabajo
-Cuando una cita pasa a estado `EJECUTADA`, el sistema crea automáticamente una
-Orden de Trabajo en `workflow-service` con los datos de la cita (idVehiculo, idCliente, fecha).
-Si la creación falla, el cambio de estado se revierte y se registra el error en los logs.
+---
 
-### RN-07: La fecha de la cita debe ser futura
-No se permiten citas con fecha y hora en el pasado.
-Esta regla se aplica mediante la anotación `@Future` en el campo `fechaHora` de la entidad `Cita`.
+## 📐 Reglas de Negocio — Módulo de Citas (`booking-service`)
 
-## Escenarios de prueba — Reglas de Negocio
+Esta sección documenta las reglas de negocio implementadas en la capa `CitaService`.
 
-| Escenario | Input esperado | Respuesta esperada |
-|-----------|---------------|--------------------|
-| Vehículo no existe | `idVehiculo` inválido | 400 + "El vehículo no existe en el sistema" |
-| Choque de horario | Cita en rango ocupado | 400 + "El vehículo ya tiene una cita en ese horario" |
-| Límite diario excedido | 21ª cita en el mismo día | 400 + "Se alcanzó el máximo de citas permitidas para este día" |
-| Transición inválida | `CANCELADA → CONFIRMADA` | 400 + "Transición de estado inválida" |
-| Fecha en el pasado | `fechaHora` < ahora | 400 + "La cita debe ser en una fecha futura" |
-| Cambio a EJECUTADA exitoso | Cita válida → EJECUTADA | 200 + orden de trabajo creada en workflow-service |
+---
+
+### RN-01: Existencia del Vehículo y Cliente
+
+Antes de registrar una cita, el sistema verifica que el vehículo y el cliente existan en la base de datos centralizada consultando al `garage-service`. Si alguno de los identificadores (`Long`) no existe, la cita se rechaza con un error `400`.
+
+---
+
+### RN-02: Duración Estándar de una Cita
+
+Cada cita tiene una duración fija de **60 minutos**. Este valor se usa para calcular el rango de tiempo ocupado al validar conflictos en el calendario del taller.
+
+---
+
+### RN-03: Sin Choques de Horario por Vehículo
+
+Un mismo vehículo no puede tener dos citas en estado `CONFIRMADA` o `EJECUTADA` cuyas ventanas de tiempo se solapen. Si se detecta un conflicto, la petición es rechazada.
+
+> **Ejemplo:** Si hay una cita de 10:00 a 11:00, un intento de reserva a las 10:30 será rechazado, pero a las 11:00 será aceptado.
+
+---
+
+### RN-04: Límite Diario de Citas del Taller
+
+El ecosistema acepta un máximo de **20 citas por día calendario**. Si se alcanza el límite de capacidad operativa, nuevas solicitudes son bloqueadas con una excepción de negocio.
+
+---
+
+### RN-05: Transiciones de Estado Válidas
+
+El ciclo de vida de la reserva es estricto. El estado de una cita (`Enum`) solo puede mutar según las siguientes transiciones permitidas:
+
+| Estado actual | Estados permitidos             |
+|---------------|-------------------------------|
+| `AGENDADA`    | `CONFIRMADA`, `CANCELADA`     |
+| `CONFIRMADA`  | `CANCELADA`, `EJECUTADA`      |
+| `CANCELADA`   | *(ninguno — estado final)*    |
+| `EJECUTADA`   | *(ninguno — estado final)*    |
+
+---
+
+### RN-06: Creación Automática de Orden de Trabajo
+
+Cuando el vehículo llega físicamente y la cita pasa a estado `EJECUTADA`, el sistema se comunica con el `workshop-service` para abrir automáticamente una **Orden de Trabajo** en estado `RECEPCIONADO`, transfiriendo el `vehiculoId` y el motivo de la visita.
+
+---
+
+### RN-07: Inmutabilidad Temporal (Citas Futuras)
+
+No se permiten agendar citas con fecha y hora en el pasado. Esta regla se aplica en la capa de entrada mediante la validación `@Future` en los records `CitaRequestDTO`.
+
+---
+
+## 🧪 Escenarios de Prueba — Reglas de Negocio
+
+| Escenario               | Input esperado                              | Respuesta HTTP esperada                                                 |
+|-------------------------|---------------------------------------------|-------------------------------------------------------------------------|
+| Entidad inexistente     | `vehiculoId` no registrado en `garage`      | `400 Bad Request` + `"El vehículo no existe en el sistema"`             |
+| Choque temporal         | Cita en rango ocupado                       | `400 Bad Request` + `"El vehículo ya tiene una cita en ese horario"`    |
+| Saturación operativa    | 21ª cita en el mismo día                    | `400 Bad Request` + `"Se alcanzó el máximo de citas permitidas para este día"` |
+| Alteración de flujo     | `CANCELADA → CONFIRMADA`                    | `400 Bad Request` + `"Transición de estado inválida"`                   |
+| Viaje en el tiempo      | `fechaHora < ahora`                         | `400 Bad Request` (Vía Jakarta Validation)                              |
+| Recepción exitosa       | `CONFIRMADA → EJECUTADA`                    | `200 OK` + Orden de trabajo autogenerada en `workshop-service`          |
