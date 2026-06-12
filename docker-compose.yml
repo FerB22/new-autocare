@@ -1,0 +1,103 @@
+version: '3.8'
+
+services:
+  # ==========================================
+  # SERVIDORES INFRAESTRUCTURA DE SPRING CLOUD
+  # ==========================================
+  eureka-server:
+    build: ./eureka-server
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - autocare-net
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 8761 || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - EUREKA_URI=http://eureka-server:8761/eureka
+    networks:
+      - autocare-net
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+
+  # ==========================================
+  # MICROSERVICIOS FUNCIONALES Y SUS BASES DE DATOS
+  # ==========================================
+  
+  # 👤 DOMINIO CLIENTE: Garage Service
+  db-garage:
+    image: postgres:15-alpine
+    container_name: db-garage
+    environment:
+      POSTGRES_DB: autocare_garage
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    networks:
+      - autocare-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d autocare_garage"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  garage-service:
+    build: ./garage-service
+    container_name: garage-service
+    environment:
+      - DB_URL=jdbc:postgresql://db-garage:5432/autocare_garage
+      - DB_USER=postgres
+      - DB_PASSWORD=admin
+      - EUREKA_URI=http://eureka-server:8761/eureka
+    networks:
+      - autocare-net
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      db-garage:
+        condition: service_healthy
+
+  # 📦 DOMINIO SUMINISTROS: Inventory Service
+  db-inventory:
+    image: postgres:15-alpine
+    container_name: db-inventory
+    environment:
+      POSTGRES_DB: autocare_inventory
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    networks:
+      - autocare-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d autocare_inventory"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  inventory-service:
+    build: ./inventory-service
+    container_name: inventory-service
+    environment:
+      - DB_URL=jdbc:postgresql://db-inventory:5432/autocare_inventory
+      - DB_USER=postgres
+      - DB_PASSWORD=admin
+      - EUREKA_URI=http://eureka-server:8761/eureka
+    networks:
+      - autocare-net
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      db-inventory:
+        condition: service_healthy
+
+networks:
+  autocare-net:
+    driver: bridge

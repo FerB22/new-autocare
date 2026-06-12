@@ -1,25 +1,19 @@
+server:
+  port: ${PORT:8082} # Usa el puerto asignado o el 8082 en local
+
 spring:
   application:
     name: inventory-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/autocare_inventory
-    username: postgres
-    password: admin
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/autocare_inventory}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:admin}
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-
-server:
-  port: 8087
 
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka
-  instance:
-    prefer-ip-address: true
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}

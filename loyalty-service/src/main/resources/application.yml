@@ -1,24 +1,19 @@
+server:
+  port: ${PORT:8088}
+
 spring:
   application:
     name: loyalty-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/autocare_loyalty
-    username: postgres
-    password: admin
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/autocare_loyalty}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:admin}
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
-    properties:
-      "[hibernate.format_sql]": true
-      "[hibernate.dialect]": org.hibernate.dialect.PostgreSQLDialect
-
-server:
-  port: 8083
 
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka
-  instance:
-    prefer-ip-address: true
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
