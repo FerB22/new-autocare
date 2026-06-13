@@ -5,6 +5,11 @@ import com.autocare.garage_service.dto.VehiculoRequestDTO;
 import com.autocare.garage_service.model.Cliente;
 import com.autocare.garage_service.model.Vehiculo;
 import com.autocare.garage_service.service.GarageService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,28 +21,63 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/garage/clientes")
 @RequiredArgsConstructor
+@Tag(name = "Módulo Garage (Clientes y Vehículos)", description = "Servicios REST para la gestión del padrón de clientes y sus hojas de vida vehiculares.")
 public class GarageController {
 
     private final GarageService service;
 
     @GetMapping
+    @Operation(
+        summary = "Listar todos los clientes registrados", 
+        description = "Recupera la nómina completa de clientes junto con sus respectivos listados de vehículos asociados desde la base de datos."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lista de clientes obtenida exitosamente.")
+    })
     public ResponseEntity<List<Cliente>> listarTodos() {
         return ResponseEntity.ok(service.obtenerTodosLosClientes());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Cliente> obtenerClientePorId(@PathVariable Long id) {
+    @Operation(
+        summary = "Obtener el perfil detallado de un cliente", 
+        description = "Busca un cliente por su ID y devuelve su información personal junto con el historial de sus vehículos."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Cliente encontrado y perfil devuelto con éxito."),
+        @ApiResponse(responseCode = "404", description = "El cliente con el ID proporcionado no existe en el sistema.")
+    })
+    public ResponseEntity<Cliente> obtenerClientePorId(
+            @Parameter(description = "Identificador numérico único del cliente (Long)", required = true) 
+            @PathVariable Long id) {
         return ResponseEntity.ok(service.obtenerPerfilCompleto(id));
     }
 
     @PostMapping
+    @Operation(
+        summary = "Registrar un nuevo cliente en el sistema", 
+        description = "Crea un registro maestro de cliente. El sistema valida mediante reglas de negocio que el correo o RUT no se encuentren duplicados (RN-01)."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Cliente creado exitosamente en el garage."),
+        @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos o el cliente ya se encuentra registrado.")
+    })
     public ResponseEntity<Cliente> crearCliente(@Valid @RequestBody ClienteRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.registrarCliente(dto));
     }
 
-    // El endpoint anidado que demuestra la relación
     @PostMapping("/{clienteId}/vehiculos")
+    @Operation(
+        summary = "Asociar un nuevo vehículo a un cliente", 
+        description = "Registra un vehículo dentro del garage y establece la relación lógica vinculándolo directamente al ID del cliente propietario."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Vehículo registrado y vinculado correctamente."),
+        @ApiResponse(responseCode = "400", description = "Estructura del vehículo inválida (ej. patente mal formateada)."),
+        @ApiResponse(responseCode = "404", description = "No se puede asociar el vehículo porque el cliente especificado no existe.")
+    })
     public ResponseEntity<Vehiculo> agregarVehiculo(
+            @Parameter(description = "ID del cliente dueño del vehículo", required = true) 
             @PathVariable Long clienteId,
             @Valid @RequestBody VehiculoRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.registrarVehiculoEnGarage(clienteId, dto));

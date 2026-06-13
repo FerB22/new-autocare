@@ -100,111 +100,291 @@ services:
         condition: service_healthy
 
   # 📅 DOMINIO AGENDAMIENTO: Booking Service
+  db-booking:
+    image: postgres:15-alpine
+    container_name: db-booking
+    environment:
+      POSTGRES_DB: autocare_booking
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    networks:
+      - autocare-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d autocare_booking"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   booking-service:
     build: ./booking-service
     container_name: booking-service
     environment:
+      - DB_URL=jdbc:postgresql://db-booking:5432/autocare_booking
+      - DB_USER=postgres
+      - DB_PASSWORD=admin
       - EUREKA_URI=http://eureka-server:8761/eureka
     networks:
       - autocare-net
     depends_on:
       eureka-server:
         condition: service_healthy
+      db-booking:
+        condition: service_healthy
 
   # 🛠️ DOMINIO OPERACIONES: Workshop Service
+  db-workshop:
+    image: postgres:15-alpine
+    container_name: db-workshop
+    environment:
+      POSTGRES_DB: autocare_workshop
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    networks:
+      - autocare-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d autocare_workshop"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   workshop-service:
     build: ./workshop-service
     container_name: workshop-service
     environment:
+      - DB_URL=jdbc:postgresql://db-workshop:5432/autocare_workshop
+      - DB_USER=postgres
+      - DB_PASSWORD=admin
       - EUREKA_URI=http://eureka-server:8761/eureka
     networks:
       - autocare-net
     depends_on:
       eureka-server:
         condition: service_healthy
+      db-workshop:
+        condition: service_healthy
 
   # 🧾 DOMINIO FINANZAS: Billing Service
+  db-billing:
+    image: postgres:15-alpine
+    container_name: db-billing
+    environment:
+      POSTGRES_DB: autocare_billing
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    networks:
+      - autocare-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d autocare_billing"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   billing-service:
     build: ./billing-service
     container_name: billing-service
     environment:
+      - DB_URL=jdbc:postgresql://db-billing:5432/autocare_billing
+      - DB_USER=postgres
+      - DB_PASSWORD=admin
       - EUREKA_URI=http://eureka-server:8761/eureka
     networks:
       - autocare-net
     depends_on:
       eureka-server:
         condition: service_healthy
+      db-billing:
+        condition: service_healthy
 
   # 🔔 DOMINIO ALERTAS: Notification Service
+  db-notification:
+    image: postgres:15-alpine
+    container_name: db-notification
+    environment:
+      POSTGRES_DB: autocare_notification
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    networks:
+      - autocare-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d autocare_notification"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   notification-service:
     build: ./notification-service
     container_name: notification-service
     environment:
+      - DB_URL=jdbc:postgresql://db-notification:5432/autocare_notification
+      - DB_USER=postgres
+      - DB_PASSWORD=admin
       - EUREKA_URI=http://eureka-server:8761/eureka
     networks:
       - autocare-net
     depends_on:
       eureka-server:
         condition: service_healthy
+      db-notification:
+        condition: service_healthy
 
   # 📊 DOMINIO ANALÍTICA: Analytics Service
+  db-analytics:
+    image: postgres:15-alpine
+    container_name: db-analytics
+    environment:
+      POSTGRES_DB: autocare_analytics
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    networks:
+      - autocare-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d autocare_analytics"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   analytics-service:
     build: ./analytics-service
     container_name: analytics-service
     environment:
+      - DB_URL=jdbc:postgresql://db-analytics:5432/autocare_analytics
+      - DB_USER=postgres
+      - DB_PASSWORD=admin
       - EUREKA_URI=http://eureka-server:8761/eureka
     networks:
       - autocare-net
     depends_on:
       eureka-server:
         condition: service_healthy
+      db-analytics:
+        condition: service_healthy
 
   # 🩺 DOMINIO DIAGNÓSTICO: Diagnostics Service
+  db-diagnostics:
+    image: postgres:15-alpine
+    container_name: db-diagnostics
+    environment:
+      POSTGRES_DB: autocare_diagnostics
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    networks:
+      - autocare-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d autocare_diagnostics"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   diagnostics-service:
     build: ./diagnostics-service
     container_name: diagnostics-service
     environment:
+      - DB_URL=jdbc:postgresql://db-diagnostics:5432/autocare_diagnostics
+      - DB_USER=postgres
+      - DB_PASSWORD=admin
       - EUREKA_URI=http://eureka-server:8761/eureka
     networks:
       - autocare-net
     depends_on:
       eureka-server:
         condition: service_healthy
+      db-diagnostics:
+        condition: service_healthy
 
   # 👥 DOMINIO RECURSOS HUMANOS: HR Service
+  db-hr:
+    image: postgres:15-alpine
+    container_name: db-hr
+    environment:
+      POSTGRES_DB: autocare_hr
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    networks:
+      - autocare-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d autocare_hr"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   hr-service:
     build: ./hr-service
     container_name: hr-service
     environment:
+      - DB_URL=jdbc:postgresql://db-hr:5432/autocare_hr
+      - DB_USER=postgres
+      - DB_PASSWORD=admin
       - EUREKA_URI=http://eureka-server:8761/eureka
     networks:
       - autocare-net
     depends_on:
       eureka-server:
         condition: service_healthy
+      db-hr:
+        condition: service_healthy
 
   # 🎁 DOMINIO FIDELIZACIÓN: Loyalty Service
+  db-loyalty:
+    image: postgres:15-alpine
+    container_name: db-loyalty
+    environment:
+      POSTGRES_DB: autocare_loyalty
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    networks:
+      - autocare-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d autocare_loyalty"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   loyalty-service:
     build: ./loyalty-service
     container_name: loyalty-service
     environment:
+      - DB_URL=jdbc:postgresql://db-loyalty:5432/autocare_loyalty
+      - DB_USER=postgres
+      - DB_PASSWORD=admin
       - EUREKA_URI=http://eureka-server:8761/eureka
     networks:
       - autocare-net
     depends_on:
       eureka-server:
         condition: service_healthy
+      db-loyalty:
+        condition: service_healthy
 
   # 🛒 DOMINIO ADQUISICIONES: Procurement Service
+  db-procurement:
+    image: postgres:15-alpine
+    container_name: db-procurement
+    environment:
+      POSTGRES_DB: autocare_procurement
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    networks:
+      - autocare-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d autocare_procurement"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   procurement-service:
     build: ./procurement-service
     container_name: procurement-service
     environment:
+      - DB_URL=jdbc:postgresql://db-procurement:5432/autocare_procurement
+      - DB_USER=postgres
+      - DB_PASSWORD=admin
       - EUREKA_URI=http://eureka-server:8761/eureka
     networks:
       - autocare-net
     depends_on:
       eureka-server:
+        condition: service_healthy
+      db-procurement:
         condition: service_healthy
 
 networks:
