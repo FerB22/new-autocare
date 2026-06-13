@@ -1,14 +1,21 @@
-# 1. Imagen base: Usamos JRE 17 sobre Alpine Linux (ligera y segura)
-FROM eclipse-temurin:17-jre-alpine
-
-# 2. Directorio de trabajo dentro del contenedor
+# ==========================================
+# ETAPA 1: COMPILACIÓN (Builder)
+# ==========================================
+# ¡Actualizado a Java 21!
+FROM maven:3.9-eclipse-temurin-21 AS builder
 WORKDIR /app
 
-# 3. Copiamos el archivo .jar generado por Maven al contenedor
-COPY target/*.jar app.jar
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-# 4. Exponemos el puerto estándar de Eureka (útil como documentación)
-EXPOSE 8761
+# ==========================================
+# ETAPA 2: EJECUCIÓN (Runtime)
+# ==========================================
+# ¡Actualizado a Java 21!
+FROM eclipse-temurin:21-jre
+WORKDIR /app
 
-# 5. Comando para arrancar el servidor de descubrimiento
+COPY --from=builder /app/target/*.jar app.jar
+
 ENTRYPOINT ["java", "-jar", "app.jar"]

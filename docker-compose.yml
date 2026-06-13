@@ -4,6 +4,7 @@ services:
   # ==========================================
   # SERVIDORES INFRAESTRUCTURA DE SPRING CLOUD
   # ==========================================
+
   eureka-server:
     build: ./eureka-server
     container_name: eureka-server
@@ -12,10 +13,10 @@ services:
     networks:
       - autocare-net
     healthcheck:
-      test: ["CMD-SHELL", "nc -z localhost 8761 || exit 1"]
-      interval: 5s
+      test: ["CMD", "curl", "-f", "http://localhost:8761/"]
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 3
 
   api-gateway:
     build: ./api-gateway
@@ -96,6 +97,114 @@ services:
       eureka-server:
         condition: service_healthy
       db-inventory:
+        condition: service_healthy
+
+  # 📅 DOMINIO AGENDAMIENTO: Booking Service
+  booking-service:
+    build: ./booking-service
+    container_name: booking-service
+    environment:
+      - EUREKA_URI=http://eureka-server:8761/eureka
+    networks:
+      - autocare-net
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+
+  # 🛠️ DOMINIO OPERACIONES: Workshop Service
+  workshop-service:
+    build: ./workshop-service
+    container_name: workshop-service
+    environment:
+      - EUREKA_URI=http://eureka-server:8761/eureka
+    networks:
+      - autocare-net
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+
+  # 🧾 DOMINIO FINANZAS: Billing Service
+  billing-service:
+    build: ./billing-service
+    container_name: billing-service
+    environment:
+      - EUREKA_URI=http://eureka-server:8761/eureka
+    networks:
+      - autocare-net
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+
+  # 🔔 DOMINIO ALERTAS: Notification Service
+  notification-service:
+    build: ./notification-service
+    container_name: notification-service
+    environment:
+      - EUREKA_URI=http://eureka-server:8761/eureka
+    networks:
+      - autocare-net
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+
+  # 📊 DOMINIO ANALÍTICA: Analytics Service
+  analytics-service:
+    build: ./analytics-service
+    container_name: analytics-service
+    environment:
+      - EUREKA_URI=http://eureka-server:8761/eureka
+    networks:
+      - autocare-net
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+
+  # 🩺 DOMINIO DIAGNÓSTICO: Diagnostics Service
+  diagnostics-service:
+    build: ./diagnostics-service
+    container_name: diagnostics-service
+    environment:
+      - EUREKA_URI=http://eureka-server:8761/eureka
+    networks:
+      - autocare-net
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+
+  # 👥 DOMINIO RECURSOS HUMANOS: HR Service
+  hr-service:
+    build: ./hr-service
+    container_name: hr-service
+    environment:
+      - EUREKA_URI=http://eureka-server:8761/eureka
+    networks:
+      - autocare-net
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+
+  # 🎁 DOMINIO FIDELIZACIÓN: Loyalty Service
+  loyalty-service:
+    build: ./loyalty-service
+    container_name: loyalty-service
+    environment:
+      - EUREKA_URI=http://eureka-server:8761/eureka
+    networks:
+      - autocare-net
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+
+  # 🛒 DOMINIO ADQUISICIONES: Procurement Service
+  procurement-service:
+    build: ./procurement-service
+    container_name: procurement-service
+    environment:
+      - EUREKA_URI=http://eureka-server:8761/eureka
+    networks:
+      - autocare-net
+    depends_on:
+      eureka-server:
         condition: service_healthy
 
 networks:

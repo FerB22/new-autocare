@@ -1,12 +1,21 @@
-# 1. Imagen base: Usamos una versión ligera de Java (JRE 17 en Alpine Linux)
-FROM eclipse-temurin:17-jre-alpine
-
-# 2. Establecemos el directorio de trabajo dentro del contenedor
+# ==========================================
+# ETAPA 1: COMPILACIÓN (Builder)
+# ==========================================
+# ¡Actualizado a Java 21!
+FROM maven:3.9-eclipse-temurin-21 AS builder
 WORKDIR /app
 
-# 3. Copiamos el ejecutable compilado (.jar) desde la carpeta target al contenedor
-# El asterisco (*) hace que este Dockerfile sea universal para todos tus servicios
-COPY target/*.jar app.jar
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-# 4. Comando de arranque: Le dice a Docker cómo iniciar la aplicación Java
+# ==========================================
+# ETAPA 2: EJECUCIÓN (Runtime)
+# ==========================================
+# ¡Actualizado a Java 21!
+FROM eclipse-temurin:21-jre
+WORKDIR /app
+
+COPY --from=builder /app/target/*.jar app.jar
+
 ENTRYPOINT ["java", "-jar", "app.jar"]
