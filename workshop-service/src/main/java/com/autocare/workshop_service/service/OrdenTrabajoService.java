@@ -52,4 +52,12 @@ public class OrdenTrabajoService {
         // Guardamos los cambios de estado locales de la orden
         return repository.save(orden);
     }
+
+    public OrdenTrabajo actualizarEstado(Long id, OrdenTrabajo.EstadoOrden nuevoEstado) {
+        OrdenTrabajo orden = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Orden de trabajo no encontrada en el sistema"));
+        
+        orden.setEstado(nuevoEstado);
+        return repository.save(orden);
+    }
 }
