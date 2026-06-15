@@ -34,6 +34,12 @@ public class CitaService {
                 .orElseThrow(() -> new CitaNoEncontradaException("No se encontró la cita con ID: " + id));
     }
 
+    public Cita cambiarEstado(Long id, String nuevoEstado) {
+        Cita cita = obtenerPorId(id);
+        cita.setEstado(Cita.EstadoCita.valueOf(nuevoEstado));
+        return repository.save(cita);
+    }
+
     public Cita actualizarCita(Long id, CitaRequestDTO dto) {
         Cita citaExistente = obtenerPorId(id);
         

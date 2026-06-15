@@ -1,8 +1,6 @@
-package com.autocare.booking_service;
+package com.autocare.booking_service.exception;
 
-import com.autocare.booking_service.exception.CitaNoEncontradaException;
-import com.autocare.booking_service.exception.HorarioOcupadoException;
-import com.autocare.booking_service.exception.VehiculoYaAgendadoException;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
