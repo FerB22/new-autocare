@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoCare - Dashboard de Cobertura</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --bg: #f4f6f9;
+            --text: #333;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 30px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e6ed;
+        }
+        .header h1 {
+            color: var(--primary);
+            margin: 0 0 10px 0;
+            font-size: 2.5rem;
+        }
+        .header p {
+            color: #666;
+            margin: 0;
+            font-size: 1.1rem;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border-top: 5px solid var(--secondary);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        .card h2 {
+            margin: 0 0 10px 0;
+            color: var(--primary);
+            font-size: 1.3rem;
+        }
+        .description {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+        .btn {
+            display: block;
+            background-color: var(--success);
+            color: white;
+            padding: 12px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
+            transition: background-color 0.2s;
+        }
+        .btn:hover {
+            background-color: #219653;
+        }
+        /* Color especial para infraestructura */
+        .infra { border-top-color: #9b59b6; }
+        .infra .btn { background-color: #9b59b6; }
+        .infra .btn:hover { background-color: #8e44ad; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Dashboard de Cobertura JaCoCo</h1>
+        <p>Ecosistema de Microservicios AutoCare (>80% Target)</p>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <h2>Analytics Service</h2>
+            <p class="description">Métricas y reportes mensuales.</p>
+            <a href="./analytics-service/target/site/jacoco/index.html" target="_blank" class="btn">Ver Reporte</a>
+        </div>
+
+        <div class="card">
+            <h2>Billing Service</h2>
+            <p class="description">Gestión de facturas y cobros.</p>
+            <a href="./billing-service/target/site/jacoco/index.html" target="_blank" class="btn">Ver Reporte</a>
+        </div>
+
+        <div class="card">
+            <h2>Booking Service</h2>
+            <p class="description">Gestión de citas y reservas.</p>
+            <a href="./booking-service/target/site/jacoco/index.html" target="_blank" class="btn">Ver Reporte</a>
+        </div>
+
+        <div class="card">
+            <h2>Diagnostics Service</h2>
+            <p class="description">Reportes de diagnóstico vehicular.</p>
+            <a href="./diagnostics-service/target/site/jacoco/index.html" target="_blank" class="btn">Ver Reporte</a>
+        </div>
+
+        <div class="card">
+            <h2>Garage Service</h2>
+            <p class="description">Gestión de clientes y vehículos.</p>
+            <a href="./garage-service/target/site/jacoco/index.html" target="_blank" class="btn">Ver Reporte</a>
+        </div>
+
+        <div class="card">
+            <h2>HR Service</h2>
+            <p class="description">Gestión de mecánicos y personal.</p>
+            <a href="./hr-service/target/site/jacoco/index.html" target="_blank" class="btn">Ver Reporte</a>
+        </div>
+
+        <div class="card">
+            <h2>Inventory Service</h2>
+            <p class="description">Control de repuestos y stock.</p>
+            <a href="./inventory-service/target/site/jacoco/index.html" target="_blank" class="btn">Ver Reporte</a>
+        </div>
+
+        <div class="card">
+            <h2>Loyalty Service</h2>
+            <p class="description">Puntos de fidelidad de clientes.</p>
+            <a href="./loyalty-service/target/site/jacoco/index.html" target="_blank" class="btn">Ver Reporte</a>
+        </div>
+
+        <div class="card">
+            <h2>Notification Service</h2>
+            <p class="description">Envío de alertas y correos.</p>
+            <a href="./notification-service/target/site/jacoco/index.html" target="_blank" class="btn">Ver Reporte</a>
+        </div>
+
+        <div class="card">
+            <h2>Procurement Service</h2>
+            <p class="description">Proveedores y órdenes de compra.</p>
+            <a href="./procurement-service/target/site/jacoco/index.html" target="_blank" class="btn">Ver Reporte</a>
+        </div>
+
+        <div class="card">
+            <h2>Workshop Service</h2>
+            <p class="description">Órdenes de trabajo en el taller.</p>
+            <a href="./workshop-service/target/site/jacoco/index.html" target="_blank" class="btn">Ver Reporte</a>
+        </div>
+
+        <div class="card infra">
+            <h2>API Gateway</h2>
+            <p class="description">Enrutador y puerta de enlace principal.</p>
+            <a href="./api-gateway/target/site/jacoco/index.html" target="_blank" class="btn">Ver Reporte</a>
+        </div>
+
+        <div class="card infra">
+            <h2>Eureka Server</h2>
+            <p class="description">Servidor de descubrimiento de servicios.</p>
+            <a href="./eureka-server/target/site/jacoco/index.html" target="_blank" class="btn">Ver Reporte</a>
+        </div>
+    </div>
+
+</body>
+</html>

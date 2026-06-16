@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -173,5 +173,88 @@ class FacturaServiceTest {
         // Mensaje exacto del service: "No se puede eliminar una factura PAGADA..."
         assertTrue(exception.getMessage().contains("No se puede eliminar una factura PAGADA"));
         verify(facturaRepository, never()).deleteById(anyLong());
+    }
+
+    // ─── LECTURA ─────────────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("Debe listar todas las facturas")
+    void listarTodas() {
+        when(facturaRepository.findAll()).thenReturn(List.of(facturaExistente));
+        
+        List<Factura> resultado = facturaService.listarTodas();
+        
+        assertFalse(resultado.isEmpty());
+        verify(facturaRepository, times(1)).findAll();
+    }
+
+    @Test
+    @DisplayName("Debe buscar factura por ID exitosamente")
+    void buscarPorIdExito() {
+        when(facturaRepository.findById(1L)).thenReturn(Optional.of(facturaExistente));
+        
+        Optional<Factura> resultado = facturaService.buscarPorId(1L);
+        
+        assertTrue(resultado.isPresent());
+        assertEquals(1L, resultado.get().getId());
+    }
+
+    @Test
+    @DisplayName("Debe lanzar excepción si el ID al buscar es nulo")
+    void buscarPorIdNulo() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            facturaService.buscarPorId(null);
+        });
+        assertEquals("El ID no puede ser nulo", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Debe buscar facturas por estado")
+    void buscarPorEstado() {
+        when(facturaRepository.findByEstado(Factura.EstadoPago.PENDIENTE))
+                .thenReturn(List.of(facturaExistente));
+        
+        List<Factura> resultado = facturaService.buscarPorEstado(Factura.EstadoPago.PENDIENTE);
+        
+        assertFalse(resultado.isEmpty());
+        assertEquals(Factura.EstadoPago.PENDIENTE, resultado.get(0).getEstado());
+    }
+
+    // ─── ANULACIÓN Y ELIMINACIÓN EXITOSA ──────────────────────────────────────
+
+    @Test
+    @DisplayName("Debe anular una factura PENDIENTE exitosamente")
+    void anularFacturaExito() {
+        when(facturaRepository.findById(1L)).thenReturn(Optional.of(facturaExistente));
+        when(facturaRepository.save(any(Factura.class))).thenReturn(facturaExistente);
+
+        Factura resultado = facturaService.anularFactura(1L);
+
+        assertEquals(Factura.EstadoPago.ANULADA, resultado.getEstado());
+        verify(facturaRepository).save(facturaExistente);
+    }
+
+    @Test
+    @DisplayName("Regla de Negocio: No anular una factura ya ANULADA")
+    void evitarAnularFacturaYaAnulada() {
+        facturaExistente.setEstado(Factura.EstadoPago.ANULADA);
+        when(facturaRepository.findById(1L)).thenReturn(Optional.of(facturaExistente));
+
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            facturaService.anularFactura(1L);
+        });
+        assertTrue(exception.getMessage().contains("ANULADA"));
+        verify(facturaRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Debe eliminar una factura exitosamente si no está PAGADA")
+    void eliminarFacturaExito() {
+        // La factura por defecto es PENDIENTE
+        when(facturaRepository.findById(1L)).thenReturn(Optional.of(facturaExistente));
+        doNothing().when(facturaRepository).deleteById(1L);
+
+        assertDoesNotThrow(() -> facturaService.eliminar(1L));
+        verify(facturaRepository, times(1)).deleteById(1L);
     }
 }

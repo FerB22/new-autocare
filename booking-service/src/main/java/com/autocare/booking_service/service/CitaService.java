@@ -19,6 +19,18 @@ public class CitaService {
     }
 
     public Cita agendarCita(CitaRequestDTO dto) {
+        // Validar límite diario (RN-04): Máximo 20 citas
+        long citasDelDia = repository.countByFecha(dto.fechaHora().toLocalDate());
+        if (citasDelDia >= 20) {
+            throw new RuntimeException("Límite de 20 citas diarias alcanzado. Intente con otra fecha.");
+        }
+
+        // Validar choque de horario (RN-03)
+        boolean horarioOcupado = repository.existsByFechaAndHora(dto.fechaHora().toLocalDate(), dto.fechaHora().toLocalTime());
+        if (horarioOcupado) {
+            throw new RuntimeException("Ya existe una cita agendada en ese horario.");
+        }
+
         Cita cita = new Cita();
         cita.setClienteId(dto.clienteId());
         cita.setVehiculoId(dto.vehiculoId());

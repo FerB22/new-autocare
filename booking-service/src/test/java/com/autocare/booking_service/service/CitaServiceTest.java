@@ -53,12 +53,9 @@ public class CitaServiceTest {
     @Test
     @DisplayName("Agendar Cita - Camino Feliz (Éxito)")
     void agendarCita_Exito() {
-        // GIVEN
-        // Para que esto compile en CitaRepository debes asegurarte de definir los métodos
-        // countByFecha(LocalDate fecha) y existsByFechaAndHora(LocalDate fecha, LocalTime hora)
-        // o adaptarlos a LocalDateTime si prefieres hacer la consulta directa con la fecha completa.
-        when(citaRepository.countByFecha(citaRequestValida.fechaHora().toLocalDate())).thenReturn(5L);
-        when(citaRepository.existsByFechaAndHora(citaRequestValida.fechaHora().toLocalDate(), citaRequestValida.fechaHora().toLocalTime())).thenReturn(false);
+        // GIVEN: El día tiene solo 5 citas y el horario específico está libre
+        when(citaRepository.countByFecha(any())).thenReturn(5L);
+        when(citaRepository.existsByFechaAndHora(any(), any())).thenReturn(false);
         when(citaRepository.save(any(Cita.class))).thenReturn(citaGuardada);
 
         // WHEN
@@ -129,5 +126,51 @@ public class CitaServiceTest {
         assertThrows(RuntimeException.class, () -> {
             citaService.obtenerPorId(999L);
         });
+    }
+
+    @Test
+    @DisplayName("Obtener todas las citas")
+    void obtenerTodas() {
+        when(citaRepository.findAll()).thenReturn(java.util.List.of(citaGuardada));
+        
+        var resultado = citaService.obtenerTodas();
+        
+        assertFalse(resultado.isEmpty());
+        verify(citaRepository, times(1)).findAll();
+    }
+
+    @Test
+    @DisplayName("Buscar por ID - Camino Feliz (Éxito)")
+    void buscarPorId_Exito() {
+        when(citaRepository.findById(100L)).thenReturn(Optional.of(citaGuardada));
+        
+        Cita resultado = citaService.obtenerPorId(100L);
+        
+        assertNotNull(resultado);
+        assertEquals(100L, resultado.getId());
+    }
+
+    @Test
+    @DisplayName("Actualizar cita exitosamente")
+    void actualizarCita_Exito() {
+        when(citaRepository.findById(100L)).thenReturn(Optional.of(citaGuardada));
+        when(citaRepository.save(any(Cita.class))).thenReturn(citaGuardada);
+
+        Cita resultado = citaService.actualizarCita(100L, citaRequestValida);
+
+        assertNotNull(resultado);
+        // Validamos que los datos se hayan mapeado (motivo se actualiza desde el DTO)
+        assertEquals("Mantenimiento preventivo", resultado.getMotivo());
+        verify(citaRepository, times(1)).save(citaGuardada);
+    }
+
+    @Test
+    @DisplayName("Eliminar cita exitosamente")
+    void eliminarCita_Exito() {
+        when(citaRepository.findById(100L)).thenReturn(Optional.of(citaGuardada));
+        doNothing().when(citaRepository).delete(citaGuardada);
+
+        assertDoesNotThrow(() -> citaService.eliminarCita(100L));
+        verify(citaRepository, times(1)).delete(citaGuardada);
     }
 }
