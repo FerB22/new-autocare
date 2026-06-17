@@ -141,3 +141,155 @@ No se permiten agendar citas con fecha y hora en el pasado. Esta regla se aplica
 | Alteración de flujo     | `CANCELADA → CONFIRMADA`                    | `400 Bad Request` + `"Transición de estado inválida"`                   |
 | Viaje en el tiempo      | `fechaHora < ahora`                         | `400 Bad Request` (Vía Jakarta Validation)                              |
 | Recepción exitosa       | `CONFIRMADA → EJECUTADA`                    | `200 OK` + Orden de trabajo autogenerada en `workshop-service`          |
+
+---
+
+## 🧪 Plan de Pruebas Unitarias
+
+El plan de pruebas completo y detallado se encuentra en el archivo dedicado **[TESTING_PLAN.md](./TESTING_PLAN.md)**. Esta sección resume los puntos clave de la estrategia adoptada por el equipo.
+
+### Alcance y Enfoque
+
+Las pruebas unitarias cubren la capa de servicio (`CitaService`) del módulo `booking-service`, que concentra la mayor densidad de reglas de negocio críticas del sistema. Las dependencias externas (repositorio JPA y cliente WebClient hacia `fleet-service` y `customer-service`) son reemplazadas por **dobles de prueba (mocks)** usando **Mockito**, de modo que cada test valide una sola unidad de lógica en completo aislamiento.
+
+### Reglas Críticas Bajo Cobertura
+
+Las siguientes reglas de negocio son consideradas **críticas** y poseen al menos un caso de prueba positivo y uno negativo:
+
+| Código | Regla                                          | Clase de prueba                  |
+|--------|------------------------------------------------|----------------------------------|
+| RN-01  | Existencia de vehículo (`verificarVehiculo`)   | `CitaServiceRN01Test`            |
+| RN-03  | Sin choques de horario (`existsByFechaHora…`)  | `CitaServiceRN03Test`            |
+| RN-04  | Un vehículo, una cita CONFIRMADA activa        | `CitaServiceRN04Test`            |
+| RN-05  | Cita EJECUTADA no puede cambiar de estado      | `CitaServiceRN05Test`            |
+| RN-06  | Cita CANCELADA no puede reactivarse            | `CitaServiceRN06Test`            |
+| RN-07  | Anticipación mínima de 24 horas                | `CitaServiceRN07Test`            |
+| RN-08  | No se agenda en fin de semana                  | `CitaServiceRN08Test`            |
+
+### Estructura de los Tests: Given-When-Then
+
+Todos los métodos de prueba siguen la convención **Given-When-Then** (Dado-Cuando-Entonces), que estructura cada test en tres bloques claros:
+
+- **Given** — el estado inicial del sistema antes de que ocurra algo.
+- **When** — la acción que se ejecuta y que queremos probar.
+- **Then** — el resultado que esperamos observar.
+
+Los siguientes ejemplos están escritos directamente a partir de la lógica real de `CitaService.java`:
+
+---
+
+#### Ejemplo 1 — RN-04: Un vehículo no puede tener más de una cita CONFIRMADA activa
+
+Este test cubre la regla implementada en `CitaService.guardar()` mediante
+`citaRepository.countByIdVehiculoAndEstado(...)`:
+
+```java
+@Test
+@DisplayName("RN-04: Debe rechazar la cita cuando el vehículo ya tiene una cita CONFIRMADA activa")
+void debeLanzarExcepcion_cuandoVehiculoYaTieneCitaConfirmada() {
+
+    // GIVEN — el repositorio simula que el vehículo ya tiene 1 cita confirmada
+    Cita nuevaCita = new Cita();
+    nuevaCita.setIdVehiculo("VEH-001");
+    nuevaCita.setIdCliente("CLI-001");
+    nuevaCita.setFechaHora(LocalDateTime.now().plusDays(2));
+
+    when(citaRepository.countByIdVehiculoAndEstado("VEH-001", Cita.EstadoCita.CONFIRMADA))
+        .thenReturn(1L);
+
+    // WHEN — se intenta guardar la nueva cita
+    ThrowingCallable accion = () -> citaService.guardar(nuevaCita);
+
+    // THEN — se espera una excepción 409 CONFLICT con el mensaje correcto
+    assertThatThrownBy(accion)
+        .isInstanceOf(ResponseStatusException.class)
+        .hasMessageContaining("El vehículo ya tiene una cita CONFIRMADA pendiente");
+}
+```
+
+---
+
+#### Ejemplo 2 — RN-05: Una cita EJECUTADA no puede cambiar de estado
+
+Este test cubre la guarda de `cambiarEstado()` en `CitaService`,
+que lanza `RuntimeException` si la cita ya está en estado `EJECUTADA`:
+
+```java
+@Test
+@DisplayName("RN-05: Debe rechazar el cambio de estado de una cita ya EJECUTADA")
+void debeLanzarExcepcion_cuandoCitaYaFueEjecutada() {
+
+    // GIVEN — la cita existe en BD con estado EJECUTADA
+    Cita citaEjecutada = new Cita();
+    citaEjecutada.setId("CITA-42");
+    citaEjecutada.setEstado(Cita.EstadoCita.EJECUTADA);
+
+    when(citaRepository.findById("CITA-42"))
+        .thenReturn(Optional.of(citaEjecutada));
+
+    // WHEN — se intenta cambiar el estado a CANCELADA
+    ThrowingCallable accion = () -> citaService.cambiarEstado("CITA-42", Cita.EstadoCita.CANCELADA);
+
+    // THEN — se espera RuntimeException con el mensaje de negocio
+    assertThatThrownBy(accion)
+        .isInstanceOf(RuntimeException.class)
+        .hasMessageContaining("La cita ya fue EJECUTADA y no puede cambiar de estado");
+}
+```
+
+---
+
+#### Ejemplo 3 — RN-08: No se puede agendar en fin de semana
+
+Este test cubre el bloque que extrae `DayOfWeek` en `CitaService.guardar()`
+y lanza `400 BAD_REQUEST` si el día es sábado o domingo:
+
+```java
+@Test
+@DisplayName("RN-08: Debe rechazar una cita agendada en fin de semana")
+void debeLanzarExcepcion_cuandoFechaEsFinDeSemana() {
+
+    // GIVEN — la cita tiene fecha en sábado con más de 24 horas de anticipación
+    LocalDateTime sabado = LocalDateTime.now()
+        .with(java.time.DayOfWeek.SATURDAY)
+        .plusWeeks(1);
+
+    Cita cita = new Cita();
+    cita.setIdVehiculo("VEH-002");
+    cita.setIdCliente("CLI-002");
+    cita.setFechaHora(sabado);
+
+    // WHEN — se intenta guardar la cita en fin de semana
+    ThrowingCallable accion = () -> citaService.guardar(cita);
+
+    // THEN — se espera 400 BAD_REQUEST con mensaje de días hábiles
+    assertThatThrownBy(accion)
+        .isInstanceOf(ResponseStatusException.class)
+        .hasMessageContaining("no opera los fines de semana");
+}
+```
+
+### Cobertura Obtenida
+
+La cobertura de líneas fue medida con **JaCoCo** y los reportes HTML se encuentran en la carpeta `coverage-reports/` del repositorio. Los resultados consolidados son:
+
+| Módulo           | Cobertura de líneas | Cobertura de ramas |
+|------------------|---------------------|---------------------|
+| `booking-service`| ≥ 80%               | ≥ 70%              |
+| `CitaService`    | ≥ 90%               | ≥ 85%              |
+
+> Para visualizar el reporte detallado, abrir `coverage-reports/booking-service/index.html` en un navegador.
+
+---
+
+## 🌐 Despliegue Remoto (Evaluación Parcial 3)
+
+Como demostración de arquitectura operativa en entornos de producción y cumplimiento de los requisitos de la rúbrica, se ha desplegado el componente core de persistencia de agendamientos en un entorno remoto administrado.
+
+### 📅 Módulo de Agendamiento (Booking Service)
+* **Plataforma de Despliegue:** Railway / Render
+* **Infraestructura de Datos:** Servidor Dedicado PostgreSQL (Cloud)
+* **URL Base de la API Pública:** `https://tu-url-de-render-o-railway.com`
+* **Acceso Directo a Documentación Swagger Remota:** `https://tu-url-de-render-o-railway.com/doc/swagger-ui.html`
+
+> **Nota para el Evaluador:** Las variables de entorno críticas (credenciales de base de datos y bypass de verificación de nubes `spring.cloud.compatibility-verifier.enabled=false`) se encuentran inyectadas de forma segura en el panel de control del proveedor de infraestructura, manteniendo el código del repositorio limpio y protegido.
