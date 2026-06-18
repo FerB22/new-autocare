@@ -11,10 +11,10 @@ public class BookingServiceApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(BookingServiceApplication.class, args);
-    }
+    }  // ← main cierra aquí
 
     @Bean
-    @LoadBalanced // ← permite usar "http://fleet-service/" en lugar de "http://localhost:8081/"
+    @LoadBalanced
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }

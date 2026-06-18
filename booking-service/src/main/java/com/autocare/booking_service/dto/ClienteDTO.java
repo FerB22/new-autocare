@@ -1,62 +1,39 @@
 package com.autocare.booking_service.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
-/**
- * DTO (Data Transfer Object) para transferencia de datos del cliente entre microservicios.
- * - Usado en llamadas WebClient a customer-service para verificar existencia del cliente.
- * - Contiene solo datos necesarios (no toda la entidad Cliente).
- * - Incluye validaciones para uso en APIs públicas.
- * 
- * Nota: En producción agregar @JsonIgnoreProperties(ignoreUnknown = true) para tolerar campos extra.
- */
+@Schema(description = "DTO de sólo lectura para visualizar la información básica del cliente cruzada desde el Customer Service.")
 public class ClienteDTO {
 
-    /**
-     * ID único del cliente en customer-service.
-     * - Formato: UUID o similar.
-     * - Obligatorio para búsquedas.
-     */
-    @NotBlank(message = "ID del cliente es obligatorio")
-    private String idCliente;
+    @Schema(description = "ID único correlativo del cliente.", example = "1")
+    @NotNull(message = "ID del cliente es obligatorio")
+    private Long idCliente;
 
-    /**
-     * Nombre del cliente (solo primer nombre).
-     * - Usado para logs y confirmaciones.
-     */
+    @Schema(description = "Primer nombre del cliente.", example = "Fernando")
     @NotBlank(message = "Nombre es obligatorio")
     private String nombre;
 
-    /**
-     * Apellido del cliente.
-     * - Usado para logs completos (nombre + apellido).
-     */
+    @Schema(description = "Apellido paterno del cliente.", example = "Barra")
     @NotBlank(message = "Apellido es obligatorio")
     private String apellido;
 
-    /**
-     * Email del cliente.
-     * - Formato RFC 5322 válido.
-     * - Único en customer-service.
-     */
+    @Schema(description = "Dirección de correo electrónico de contacto principal.", example = "contacto@ejemplo.com")
     @NotBlank(message = "Email es obligatorio")
     @Email(message = "Email debe tener formato válido")
     private String email;
 
-    /**
-     * Teléfono del cliente.
-     * - Formato chileno: +56 9XXXXX XXXX.
-     * - Opcional pero recomendado.
-     */
+    @Schema(description = "Número telefónico móvil con formato chileno (+569).", example = "+56987654321")
     @Pattern(regexp = "^(\\+56|0)?9\\d{8}$", 
              message = "Teléfono debe tener formato chileno válido (+569XXXXXXXX o 9XXXXXXXX)")
     private String telefono;
 
-    // Getters y setters (generados por Lombok @Data en versión moderna)
-    public String getIdCliente() { return idCliente; }
-    public void setIdCliente(String idCliente) { this.idCliente = idCliente; }
+    // Getters y setters (se mantienen exactamente igual)
+    public Long getIdCliente() { return idCliente; }
+    public void setIdCliente(Long idCliente) { this.idCliente = idCliente; }
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
     public String getApellido() { return apellido; }
@@ -66,10 +43,7 @@ public class ClienteDTO {
     public String getTelefono() { return telefono; }
     public void setTelefono(String telefono) { this.telefono = telefono; }
 
-    /**
-     * Nombre completo para uso en logs y respuestas.
-     * - Computed property (no persistida).
-     */
+    @Schema(description = "Computed property que une nombre y apellido. No se persiste en base de datos.", example = "Fernando Barra")
     public String getNombreCompleto() {
         return nombre + " " + apellido;
     }

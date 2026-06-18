@@ -54,7 +54,7 @@ class CitaControllerTest {
     void crearCita_DeberiaRetornar201() throws Exception {
         when(citaService.agendarCita(any(CitaRequestDTO.class))).thenReturn(citaBase);
 
-        mockMvc.perform(post("/citas")
+        mockMvc.perform(post("/api/reservas/citas")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated())
@@ -65,7 +65,7 @@ class CitaControllerTest {
     void obtenerCitaPorId_DeberiaRetornar200() throws Exception {
         when(citaService.obtenerPorId(1L)).thenReturn(citaBase);
 
-        mockMvc.perform(get("/citas/1"))
+        mockMvc.perform(get("/api/reservas/citas/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1));
     }
@@ -74,7 +74,7 @@ class CitaControllerTest {
     void obtenerTodas_DeberiaRetornar200() throws Exception {
         when(citaService.obtenerTodas()).thenReturn(List.of(citaBase));
 
-        mockMvc.perform(get("/citas"))
+        mockMvc.perform(get("/api/reservas/citas"))
                 .andExpect(status().isOk());
     }
 
@@ -82,7 +82,7 @@ class CitaControllerTest {
     void actualizarCita_DeberiaRetornar200() throws Exception {
         when(citaService.actualizarCita(eq(1L), any(CitaRequestDTO.class))).thenReturn(citaBase);
 
-        mockMvc.perform(put("/citas/1")
+        mockMvc.perform(put("/api/reservas/citas/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
@@ -93,7 +93,7 @@ class CitaControllerTest {
     void eliminarCita_DeberiaRetornar204() throws Exception {
         doNothing().when(citaService).eliminarCita(1L);
 
-        mockMvc.perform(delete("/citas/1"))
+        mockMvc.perform(delete("/api/reservas/citas/1"))
                 .andExpect(status().isNoContent());
     }
 }

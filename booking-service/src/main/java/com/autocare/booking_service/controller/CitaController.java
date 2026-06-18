@@ -1,5 +1,6 @@
 package com.autocare.booking_service.controller;
 
+import com.autocare.booking_service.assembler.CitaModelAssembler;
 import com.autocare.booking_service.model.Cita;
 import com.autocare.booking_service.dto.CitaRequestDTO;
 import com.autocare.booking_service.service.CitaService;
@@ -9,25 +10,23 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import jakarta.validation.Valid;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
 @RestController
-@RequestMapping("/citas")
+@RequestMapping("/api/reservas/citas")
 @RequiredArgsConstructor
-@Tag(name = "📅 Módulo de Citas (Agendamiento)", description = "Servicios REST con soporte HATEOAS para la reserva de ventanas horarias, control de capacidad física del taller y estados de citas.")
+@Tag(name = "Módulo de Citas (Agendamiento)", description = "Servicios REST con soporte HATEOAS para la reserva de ventanas horarias, control de capacidad física del taller y estados de citas.")
 public class CitaController {
 
     private final CitaService citaService;
+    private final CitaModelAssembler assembler;
 
     @PostMapping
     @Operation(
@@ -38,13 +37,10 @@ public class CitaController {
         @ApiResponse(responseCode = "201", description = "Cita agendada con éxito. El payload de retorno incluye los hiperenlaces HATEOAS relacionales."),
         @ApiResponse(responseCode = "400", description = "Fallo de validación: Choque temporal o el taller alcanzó su capacidad máxima de saturación.")
     })
-    public ResponseEntity<EntityModel<Cita>> crearCita(@RequestBody CitaRequestDTO citaDTO) {
+    public ResponseEntity<EntityModel<Cita>> crearCita(@Valid @RequestBody CitaRequestDTO citaDTO) {
         Cita nuevaCita = citaService.agendarCita(citaDTO);
-        EntityModel<Cita> recurso = EntityModel.of(nuevaCita);
-        
-        recurso.add(linkTo(methodOn(CitaController.class).obtenerCitaPorId(nuevaCita.getId())).withSelfRel());
-        recurso.add(linkTo(methodOn(CitaController.class).obtenerTodas()).withRel("todas-las-citas"));
-        
+        // Delegamos al assembler la creación del EntityModel con sus links correspondientes
+        EntityModel<Cita> recurso = assembler.toModel(nuevaCita);
         return new ResponseEntity<>(recurso, HttpStatus.CREATED);
     }
 
@@ -61,12 +57,8 @@ public class CitaController {
             @Parameter(description = "Identificador único correlativo de la cita (Long)", required = true) 
             @PathVariable Long id) {
         Cita cita = citaService.obtenerPorId(id);
-        EntityModel<Cita> recurso = EntityModel.of(cita);
-
-        recurso.add(linkTo(methodOn(CitaController.class).obtenerCitaPorId(id)).withSelfRel());
-        recurso.add(linkTo(methodOn(CitaController.class).obtenerTodas()).withRel("todas-las-citas"));
-
-        return ResponseEntity.ok(recurso);
+        // Reemplazamos la creación manual por el uso del assembler
+        return ResponseEntity.ok(assembler.toModel(cita));
     }
 
     @GetMapping
@@ -79,17 +71,8 @@ public class CitaController {
     })
     public ResponseEntity<CollectionModel<EntityModel<Cita>>> obtenerTodas() {
         List<Cita> citas = citaService.obtenerTodas();
-        
-        List<EntityModel<Cita>> citasRecursos = new ArrayList<>();
-        for (Cita cita : citas) {
-            EntityModel<Cita> recurso = EntityModel.of(cita);
-            recurso.add(linkTo(methodOn(CitaController.class).obtenerCitaPorId(cita.getId())).withSelfRel());
-            citasRecursos.add(recurso);
-        }
-
-        CollectionModel<EntityModel<Cita>> modeloColeccion = CollectionModel.of(citasRecursos);
-        modeloColeccion.add(linkTo(methodOn(CitaController.class).obtenerTodas()).withSelfRel());
-
+        // Usamos el método heredado de RepresentationModelAssembler para transformar la colección completa
+        CollectionModel<EntityModel<Cita>> modeloColeccion = assembler.toCollectionModel(citas);
         return ResponseEntity.ok(modeloColeccion);
     }
 
@@ -107,12 +90,8 @@ public class CitaController {
             @PathVariable Long id, 
             @RequestBody CitaRequestDTO citaDTO) {
         Cita citaActualizada = citaService.actualizarCita(id, citaDTO);
-        EntityModel<Cita> recurso = EntityModel.of(citaActualizada);
-
-        recurso.add(linkTo(methodOn(CitaController.class).obtenerCitaPorId(id)).withSelfRel());
-        recurso.add(linkTo(methodOn(CitaController.class).obtenerTodas()).withRel("todas-las-citas"));
-
-        return ResponseEntity.ok(recurso);
+        // El assembler se encarga de estructurar el retorno homogéneamente
+        return ResponseEntity.ok(assembler.toModel(citaActualizada));
     }
 
     @DeleteMapping("/{id}")

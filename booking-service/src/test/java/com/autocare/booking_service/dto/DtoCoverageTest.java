@@ -33,14 +33,14 @@ class DtoCoverageTest {
         ClienteDTO cliente = new ClienteDTO();
         
         // Ejecutamos todos los Setters para dar cobertura
-        cliente.setIdCliente("CLI-100");
+        cliente.setIdCliente(100L);
         cliente.setNombre("Fernando");
         cliente.setApellido("Barra");
         cliente.setEmail("fernando@mail.com");
         cliente.setTelefono("+56912345678");
 
         // Ejecutamos todos los Getters para verificar y dar cobertura
-        assertEquals("CLI-100", cliente.getIdCliente());
+        assertEquals(100L, cliente.getIdCliente());
         assertEquals("Fernando", cliente.getNombre());
         assertEquals("Barra", cliente.getApellido());
         assertEquals("fernando@mail.com", cliente.getEmail());
@@ -56,13 +56,13 @@ class DtoCoverageTest {
         VehiculoDTO vehiculo = new VehiculoDTO();
         
         // Ejecutamos todos los Setters para dar cobertura
-        vehiculo.setId("VEH-200");
+        vehiculo.setId(200L);
         vehiculo.setMarca("Toyota");
         vehiculo.setModelo("Corolla");
         vehiculo.setPatente("ABCD123");
 
         // Ejecutamos todos los Getters para verificar y dar cobertura
-        assertEquals("VEH-200", vehiculo.getId());
+        assertEquals(200L, vehiculo.getId());
         assertEquals("Toyota", vehiculo.getMarca());
         assertEquals("Corolla", vehiculo.getModelo());
         assertEquals("ABCD123", vehiculo.getPatente());

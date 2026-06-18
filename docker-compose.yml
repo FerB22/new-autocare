@@ -6,17 +6,17 @@ services:
   # ==========================================
 
   eureka-server:
-    build: ./eureka-server
-    container_name: eureka-server
-    ports:
-      - "8761:8761"
-    networks:
-      - autocare-net
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8761/"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
+      build: ./eureka-server
+      container_name: eureka-server
+      ports:
+        - "8761:8761"
+      networks:
+        - autocare-net
+      healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:8761/"]
+        interval: 15s
+        timeout: 10s
+        retries: 10
 
   api-gateway:
     build: ./api-gateway
@@ -47,13 +47,15 @@ services:
       - autocare-net
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d autocare_garage"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
 
   garage-service:
     build: ./garage-service
     container_name: garage-service
+    ports:
+      - "8081:8081"
     environment:
       - DB_URL=jdbc:postgresql://db-garage:5432/autocare_garage
       - DB_USER=postgres
@@ -79,9 +81,9 @@ services:
       - autocare-net
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d autocare_inventory"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
 
   inventory-service:
     build: ./inventory-service
@@ -111,13 +113,15 @@ services:
       - autocare-net
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d autocare_booking"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
 
   booking-service:
     build: ./booking-service
     container_name: booking-service
+    ports:
+      - "8085:8085"
     environment:
       - DB_URL=jdbc:postgresql://db-booking:5432/autocare_booking
       - DB_USER=postgres
@@ -143,9 +147,9 @@ services:
       - autocare-net
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d autocare_workshop"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
 
   workshop-service:
     build: ./workshop-service
@@ -175,9 +179,9 @@ services:
       - autocare-net
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d autocare_billing"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
 
   billing-service:
     build: ./billing-service
@@ -207,9 +211,9 @@ services:
       - autocare-net
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d autocare_notification"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
 
   notification-service:
     build: ./notification-service
@@ -239,9 +243,9 @@ services:
       - autocare-net
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d autocare_analytics"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
 
   analytics-service:
     build: ./analytics-service
@@ -271,9 +275,9 @@ services:
       - autocare-net
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d autocare_diagnostics"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
 
   diagnostics-service:
     build: ./diagnostics-service
@@ -303,9 +307,9 @@ services:
       - autocare-net
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d autocare_hr"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
 
   hr-service:
     build: ./hr-service
@@ -335,9 +339,9 @@ services:
       - autocare-net
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d autocare_loyalty"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
 
   loyalty-service:
     build: ./loyalty-service
@@ -367,9 +371,9 @@ services:
       - autocare-net
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d autocare_procurement"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
 
   procurement-service:
     build: ./procurement-service

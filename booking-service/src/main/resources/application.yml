@@ -1,5 +1,6 @@
 server:
   port: ${PORT:8085}
+  forward-headers-strategy: framework
 
 spring:
   application:
@@ -15,6 +16,12 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  cloud:
+    compatibility-verifier:
+      enabled: false
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 
 eureka:
   client:
@@ -27,3 +34,4 @@ springdoc:
   swagger-ui:
     enabled: true
     path: /doc/swagger-ui.html
+  hateoasRestHandlerMappingEnabled: false

@@ -1,57 +1,37 @@
 package com.autocare.booking_service.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-/**
- * DTO para transferencia de datos del vehículo entre microservicios.
- * - Usado en llamadas WebClient a fleet-service para verificar existencia del vehículo.
- * - Contiene datos identificatorios mínimos (no toda la entidad Vehiculo).
- * - Validaciones específicas para formato chileno de patentes.
- * 
- * Nota: Patente chilena formato actual: ABC1234 o ABCD12 (4 letras + 3/2 números).
- */
+@Schema(description = "DTO de sólo lectura que representa el vehículo enlazado a una cita, validado contra el Fleet Service.")
 public class VehiculoDTO {
 
-    /**
-     * ID único del vehículo en fleet-service.
-     * - Formato: UUID generado por la BD.
-     * - Obligatorio para búsquedas y referencias.
-     */
-    @NotBlank(message = "ID del vehículo es obligatorio")
-    private String id;
+    @Schema(description = "Identificador único correlativo del vehículo.", example = "25")
+    @NotNull(message = "ID del vehículo es obligatorio")
+    private Long id;
 
-    /**
-     * Marca del vehículo (ej: Toyota, Ford, Hyundai).
-     * - Usado en logs y confirmaciones de cita.
-     */
+    @Schema(description = "Marca fabricante del automóvil.", example = "Toyota")
     @NotBlank(message = "Marca es obligatoria")
     @Size(max = 30, message = "Marca no puede exceder 30 caracteres")
     private String marca;
 
-    /**
-     * Modelo del vehículo (ej: Corolla, F-150, Tucson).
-     * - Usado en logs detallados.
-     */
+    @Schema(description = "Modelo y línea del automóvil.", example = "Corolla Cross")
     @NotBlank(message = "Modelo es obligatorio")
     @Size(max = 50, message = "Modelo no puede exceder 50 caracteres")
     private String modelo;
 
-    /**
-     * Patente chilena única del vehículo.
-     * - Formato actual (desde 2008): 4 letras + 3 números (ABCD123) o 4 letras + 2 números (ABCD12).
-     * - Valida regex específico para Chile.
-     * - Única en fleet-service.
-     */
+    @Schema(description = "Placa patente del vehículo. Exige formato único chileno (4 letras y 2/3 números).", example = "ABCD12")
     @NotBlank(message = "Patente es obligatoria")
     @Pattern(regexp = "^[A-Z]{4}[0-9]{2,3}$", 
              message = "Patente debe tener formato chileno (ABCD123 o ABCD12)")
     private String patente;
 
-    // Getters y setters estándar
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    // Getters y setters (se mantienen exactamente igual)
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
     public String getMarca() { return marca; }
     public void setMarca(String marca) { this.marca = marca; }
     public String getModelo() { return modelo; }
@@ -59,10 +39,7 @@ public class VehiculoDTO {
     public String getPatente() { return patente; }
     public void setPatente(String patente) { this.patente = patente; }
 
-    /**
-     * Descripción legible del vehículo para logs y confirmaciones.
-     * - Ejemplo: "Toyota Corolla - ABC1234"
-     */
+    @Schema(description = "String combinada para lectura rápida en frontend.", example = "Toyota Corolla Cross - ABCD12")
     public String getDescripcionCompleta() {
         return String.format("%s %s - %s", marca, modelo, patente);
     }
