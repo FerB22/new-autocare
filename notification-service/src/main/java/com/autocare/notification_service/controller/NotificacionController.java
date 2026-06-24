@@ -24,7 +24,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Tag(name = "Módulo de Notificaciones", description = "Servicios REST para el envío, consulta y gestión de notificaciones del taller.")
 @RestController
-@RequestMapping("/notificaciones")
+@RequestMapping("/api/notificaciones")
 @RequiredArgsConstructor
 public class NotificacionController {
 
