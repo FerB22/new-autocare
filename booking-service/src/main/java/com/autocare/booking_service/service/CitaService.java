@@ -1,5 +1,6 @@
 package com.autocare.booking_service.service;
 
+import com.autocare.booking_service.exception.HorarioOcupadoException;
 import com.autocare.booking_service.dto.CitaRequestDTO;
 import com.autocare.booking_service.exception.CitaNoEncontradaException;
 import com.autocare.booking_service.model.Cita;
@@ -22,13 +23,13 @@ public class CitaService {
         // Validar límite diario (RN-04): Máximo 20 citas
         long citasDelDia = repository.countByFecha(dto.fechaHora().toLocalDate());
         if (citasDelDia >= 20) {
-            throw new RuntimeException("Límite de 20 citas diarias alcanzado. Intente con otra fecha.");
+            throw new HorarioOcupadoException("Límite de 20 citas diarias alcanzado. Intente con otra fecha.");
         }
 
         // Validar choque de horario (RN-03)
         boolean horarioOcupado = repository.existsByFechaAndHora(dto.fechaHora().toLocalDate(), dto.fechaHora().toLocalTime());
         if (horarioOcupado) {
-            throw new RuntimeException("Ya existe una cita agendada en ese horario.");
+            throw new HorarioOcupadoException("Ya existe una cita agendada en ese horario.");
         }
 
         Cita cita = new Cita();

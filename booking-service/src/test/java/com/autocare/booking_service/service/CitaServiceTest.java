@@ -1,1 +1,186 @@
-cGFja2FnZSBjb20uYXV0b2NhcmUuYm9va2luZ19zZXJ2aWNlLnNlcnZpY2U7CgppbXBvcnQgY29tLmF1dG9jYXJlLmJvb2tpbmdfc2VydmljZS5kdG8uQ2l0YVJlcXVlc3REVU87CmltcG9ydCBjb20uYXV0b2NhcmUuYm9va2luZ19zZXJ2aWNlLm1vZGVsLkNpdGE7CmltcG9ydCBjb20uYXV0b2NhcmUuYm9va2luZ19zZXJ2aWNlLnJlcG9zaXRvcnkuQ2l0YVJlcG9zaXRvcnk7CmltcG9ydCBvcmcuanVuaXQuanVwaXRlci5hcGkuQmVmb3JlRWFjaDsKaW1wb3J0IG9yZy5qdW5pdC5qdXBpdGVyLmFwaS5EaXNwbGF5TmFtZTsKaW1wb3J0IG9yZy5qdW5pdC5qdXBpdGVyLmFwaS5UZXN0OwppbXBvcnQgb3JnLmp1bml0Lmp1cGl0ZXIuYXBpLmV4dGVuc2lvbi5FeHRlbmRXaXRoOwppbXBvcnQgb3JnLm1vY2tpdG8uSW5qZWN0TW9ja3M7CmltcG9ydCBvcmcubW9ja2l0by5Nb2NrOwppbXBvcnQgb3JnLm1vY2tpdG8uanVuaXQuanVwaXRlci5Nb2NraXRvRXh0ZW5zaW9uOwoKaW1wb3J0IGphdmEudGltZS5Mb2NhbERhdGVUaW1lOwppbXBvcnQgamF2YS51dGlsLkxpc3Q7CmltcG9ydCBqYXZhLnV0aWwuT3B0aW9uYWw7CgppbXBvcnQgc3RhdGljIG9yZy5qdW5pdC5qdXBpdGVyLmFwaS5Bc3NlcnRpb25zLio7CmltcG9ydCBzdGF0aWMgb3JnLm1vY2tpdG8uQXJndW1lbnRNYXRjaGVycy5hbnk7CmltcG9ydCBzdGF0aWMgb3JnLm1vY2tpdG8uTW9ja2l0by4qOwoKQEV4dGVuZFdpdGgoTW9ja2l0b0V4dGVuc2lvbi5jbGFzcykKcHVibGljIGNsYXNzIENpdGFTZXJ2aWNlVGVzdCB7CgogICAgLy8gTk9UQTogZWwgbm9tYnJlIGRlbCBtb2NrICJyZXBvc2l0b3J5IiBkZWJlIGNvaW5jaWRpciBjb24gZWwgY2FtcG8KICAgIC8vIHByaXZhdGUgZmluYWwgQ2l0YVJlcG9zaXRvcnkgcmVwb3NpdG9yeTsgZGVmaW5pZG8gZW4gQ2l0YVNlcnZpY2UKICAgIEBNb2NrCiAgICBwcml2YXRlIENpdGFSZXBvc2l0b3J5IHJlcG9zaXRvcnk7CgogICAgQEluamVjdE1vY2tzCiAgICBwcml2YXRlIENpdGFTZXJ2aWNlIGNpdGFTZXJ2aWNlOwoKICAgIHByaXZhdGUgQ2l0YVJlcXVlc3REVU8gY2l0YVJlcXVlc3RWYWxpZGE7CiAgICBwcml2YXRlIENpdGEgY2l0YUd1YXJkYWRhOwoKICAgIEBCZWZvcmVFYWNoCiAgICB2b2lkIHNldFVwKCkgewogICAgICAgIGNpdGFSZXF1ZXN0VmFsaWRhID0gbmV3IENpdGFSZXF1ZXN0RFRPKAogICAgICAgICAgICAgICAgMUwsCiAgICAgICAgICAgICAgICAxMEwsCiAgICAgICAgICAgICAgICBMb2NhbERhdGVUaW1lLm9mKDIwMjYsIDEwLCAxNSwgMTAsIDMwKSwKICAgICAgICAgICAgICAgICJNYW50ZW5pbWllbnRvIHByZXZlbnRpdm8iCiAgICAgICAgKTsKCiAgICAgICAgY2l0YUd1YXJkYWRhID0gbmV3IENpdGEoKTsKICAgICAgICBjaXRhR3VhcmRhZGEuc2V0SWQoMTAwTCk7CiAgICAgICAgY2l0YUd1YXJkYWRhLnNldENsaWVudGVJZCgxTCk7CiAgICAgICAgY2l0YUd1YXJkYWRhLnNldFZlaGljdWxvSWQoMTBMKTsKICAgICAgICBjaXRhR3VhcmRhZGEuc2V0RmVjaGFIb3JhKExvY2FsRGF0ZVRpbWUub2YoMjAyNiwgMTAsIDE1LCAxMCwgMzApKTsKICAgICAgICBjaXRhR3VhcmRhZGEuc2V0RXN0YWRvKENpdGEuRXN0YWRvQ2l0YS5BR0VOREFEQUQ7CiAgICB9CgogICAgQFRlc3QKICAgIEBEaXNwbGF5TmFtZSgiQWdlbmRhciBDaXRhIC0gQ2FtaW5vIEZlbGl6IChFeGl0bykiKQogICAgdm9pZCBhZ2VuZGFyQ2l0YV9FeGl0bygpIHsKICAgICAgICAvLyBHSVZFTjogZWwgZGlhIHRpZW5lIHNvbG8gNSBjaXRhcyB5IGVsIGhvcmFyaW8gZXNwZWNpZmljbyBlc3RhIGxpYnJlCiAgICAgICAgd2hlbihyZXBvc2l0b3J5LmNvdW50QnlGZWNoYShhbnkoKSkpLnRoZW5SZXR1cm4oNUwpOwogICAgICAgIHdoZW4ocmVwb3NpdG9yeS5leGlzdHNCeUZlY2hhQW5kSG9yYShhbnkoKSwgYW55KCkpKS50aGVuUmV0dXJuKGZhbHNlKTsKICAgICAgICB3aGVuKHJlcG9zaXRvcnkuc2F2ZShhbnkoQ2l0YS5jbGFzcykpKS50aGVuUmV0dXJuKGNpdGFHdWFyZGFkYSk7CgogICAgICAgIC8vIFdIRU4KICAgICAgICBDaXRhIHJlc3VsdGFkbyA9IGNpdGFTZXJ2aWNlLmFnZW5kYXJDaXRhKGNpdGFSZXF1ZXN0VmFsaWRhKTsKCiAgICAgICAgLy8gVEhFTgogICAgICAgIGFzc2VydE5vdE51bGwocmVzdWx0YWRvKTsKICAgICAgICBhc3NlcnRFcXVhbHMoQ2l0YS5Fc3RhZG9DaXRhLkFHRU5EQURBLCB yZXN1bHRhZG8uZ2V0RXN0YWRvKCkpOwogICAgICAgIGFzc2VydEVxdWFscygxMDBMLCByZXN1bHRhZG8uZ2V0SWQoKSk7CiAgICAgICAgdmVyaWZ5KHJlcG9zaXRvcnksIHRpbWVzKDEpKS5zYXZlKGFueShDaXRhLmNsYXNzKSk7CiAgICB9CgogICAgQFRlc3QKICAgIEBEaXNwbGF5TmFtZSgiVmFsaWRhY2lvbiBSTi0wNDogUmVjaGF6YXIgYWdlbmRhbWllbnRvIHNpIHN1cGVyYSAyMCBjaXRhcyBkaWFyaWFzIikKICAgIHZvaWQgYWdlbmRhckNpdGFfTGFuemFFeGNlcGNpb25fUG9yTGltaXRlRGlhcmlvKCkgewogICAgICAgIC8vIEdJVkVOCiAgICAgICAgd2hlbihyZXBvc2l0b3J5LmNvdW50QnlGZWNoYShjaXRhUmVxdWVzdFZhbGlkYS5mZWNoYUhvcmEoKS50b0xvY2FsRGF0ZSgpKSkudGhlblJldHVybigyMEwpOwoKICAgICAgICAvLyBXSEVOICYgVEhFTgogICAgICAgIFJ1bnRpbWVFeGNlcHRpb24gZXhjZXB0aW9uID0gYXNzZXJ0VGhyb3dzKFJ1bnRpbWVFeGNlcHRpb24uY2xhc3MsICgpIC0+IHsKICAgICAgICAgICAgY2l0YVNlcnZpY2UuYWdlbmRhckNpdGEoY2l0YVJlcXVlc3RWYWxpZGEpOwogICAgICAgIH0pOwoKICAgICAgICBhc3NlcnRUcnVlKGV4Y2VwdGlvbi5nZXRNZXNzYWdlKCkuY29udGFpbnMoIkxpbWl0ZSBkZSAyMCBjaXRhcyBkaWFyaWFzIGFsY2FuemFkbyIpKTsKICAgICAgICB2ZXJpZnkocmVwb3NpdG9yeSwgbmV2ZXIoKSkuc2F2ZShhbnkoQ2l0YS5jbGFzcykpOwogICAgfQoKICAgIEBUZXN0CiAgICBARGlzcGxheU5hbWUoIlZhbGlkYWNpb24gUk4tMDM6IFJlY2hhenMgYWdlbmRhbWllbnRvIHBvciBjaG9xdWUgZGUgaG9yYXJpbyIpCiAgICB2b2lkIGFnZW5kYXJDaXRhX0xhbnphRXhjZXBjaW9uX1BvckNob3F1ZURlSG9yYXJpbygpIHsKICAgICAgICAvLyBHSVZFTgogICAgICAgIHdoZW4ocmVwb3NpdG9yeS5jb3VudEJ5RmVjaGEoY2l0YVJlcXVlc3RWYWxpZGEuZmVjaGFIb3JhKCkudG9Mb2NhbERhdGUoKSkpLnRoZW5SZXR1cm4oMTBMKTsKICAgICAgICB3aGVuKHJlcG9zaXRvcnkuZXhpc3RzQnlGZWNoYUFuZEhvcmEoCiAgICAgICAgICAgICAgICBjaXRhUmVxdWVzdFZhbGlkYS5mZWNoYUhvcmEoKS50b0xvY2FsRGF0ZSgpLAogICAgICAgICAgICAgICAgY2l0YVJlcXVlc3RWYWxpZGEuZmVjaGFIb3JhKCkudG9Mb2NhbFRpbWUoKSkpLnRoZW5SZXR1cm4odHJ1ZSk7CgogICAgICAgIC8vIFdIRU4gJiBUSEVOCiAgICAgICAgUnVudGltZUV4Y2VwdGlvbiBleGNlcHRpb24gPSBhc3NlcnRUaHJvd3MoUnVudGltZUV4Y2VwdGlvbi5jbGFzcywgKCkgLT4gewogICAgICAgICAgICBjaXRhU2VydmljZS5hZ2VuZGFyQ2l0YShjaXRhUmVxdWVzdFZhbGlkYSk7CiAgICAgICAgfSk7CgogICAgICAgIGFzc2VydFRydWUoZXhjZXB0aW9uLmdldE1lc3NhZ2UoKS5jb250YWlucygiWWEgZXhpc3RlIHVuYSBjaXRhIGFnZW5kYWRhIGVuIGVzZSBob3JhcmlvIikpOwogICAgICAgIHZlcmlmeShyZXBvc2l0b3J5LCBuZXZlcigpKS5zYXZlKGFueShDaXRhLmNsYXNzKSk7CiAgICB9CgogICAgQFRlc3QKICAgIEBEaXNwbGF5TmFtZSgiVmFsaWRhY2lvbiBSTi0wNTogQWN0dWFsaXphciBlc3RhZG8gZGUgY2l0YSBleGl0b3NhbWVudGUiKQogICAgdm9pZCBhY3R1YWxpemFyRXN0YWRvX0V4aXRvKCkgewogICAgICAgIC8vIEdJVkVOCiAgICAgICAgd2hlbihyZXBvc2l0b3J5LmZpbmRCeUlkKDEwMEwpKS50aGVuUmV0dXJuKE9wdGlvbmFsLm9mKGNpdGFHdWFyZGFkYSkpOwogICAgICAgIHdoZW4ocmVwb3NpdG9yeS5zYXZlKGFueShDaXRhLmNsYXNzKSkpLnRoZW5SZXR1cm4oY2l0YUd1YXJkYWRhKTsKCiAgICAgICAgLy8gV0hFTgogICAgICAgIENpdGEgcmVzdWx0YWRvID0gY2l0YVNlcnZpY2UuY2FtYmlhckVzdGFkbygxMDBMLCAiQ09ORklSTUFEQSIpOwoKICAgICAgICAvLyBUSEVOCiAgICAgICAgYXNzZXJ0RXF1YWxzKENpdGEuRXN0YWRvQ2l0YS5DT05GSVJNQURBLCB yZXN1bHRhZG8uZ2V0RXN0YWRvKCkpOwogICAgICAgIHZlcmlmeShyZXBvc2l0b3J5LCB0aW1lcygxKSkuc2F2ZShjaXRhR3VhcmRhZGEpOwogICAgfQoKICAgIEBUZXN0CiAgICBARGlzcGxheU5hbWUoIkJ1c2NhciBwb3IgSUQgLSBMYW56YSBFY2VwY2lvbiBzaSBubyBleGlzdGUiKQogICAgdm9pZCBidXNjYXJQb3JJRF9MYW56YUV4Y2VwY2lvbl9Ob0VuY29udHJhZGEoKSB7CiAgICAgICAgLy8gR0lWRU4KICAgICAgICB3aGVuKHJlcG9zaXRvcnkuZmluZEJ5SWQoOTk5TCkpLnRoZW5SZXR1cm4oT3B0aW9uYWwuZW1wdHkoKSk7CgogICAgICAgIC8vIFdIRU4gJiBUSEVOCiAgICAgICAgYXNzZXJ0VGhyb3dzKFJ1bnRpbWVFeGNlcHRpb24uY2xhc3MsICgpIC0+IHsKICAgICAgICAgICAgY2l0YVNlcnZpY2Uub2J0ZW5lclBvcklkKDk5OUwpOwogICAgICAgIH0pOwogICAgfQoKICAgIEBUZXN0CiAgICBARGlzcGxheU5hbWUoIk9idGVuZXIgdG9kYXMgbGFzIGNpdGFzIikKICAgIHZvaWQgb2J0ZW5lclRvZGFzKCkgewogICAgICAgIC8vIEdJVkVOCiAgICAgICAgd2hlbihyZXBvc2l0b3J5LmZpbmRBbGwoKSkudGhlblJldHVybihMaXN0Lm9mKGNpdGFHdWFyZGFkYSkpOwoKICAgICAgICAvLyBXSEVOCiAgICAgICAgdmFyIHJlc3VsdGFkbyA9IGNpdGFTZXJ2aWNlLm9idGVuZXJUb2RhcygpOwoKICAgICAgICAvLyBUSEVOCiAgICAgICAgYXNzZXJ0RmFsc2UocmVzdWx0YWRvLmlzRW1wdHkoKSk7CiAgICAgICAgdmVyaWZ5KHJlcG9zaXRvcnksIHRpbWVzKDEpKS5maW5kQWxsKCk7CiAgICB9CgogICAgQFRlc3QKICAgIEBEaXNwbGF5TmFtZSgiQnVzY2FyIHBvciBJRCAtIENhbWlubyBGZWxpeiAoRXhpdG8pIikKICAgIHZvaWQgYnVzY2FyUG9ySURfRXhpdG8oKSB7CiAgICAgICAgLy8gR0lWRU4KICAgICAgICB3aGVuKHJlcG9zaXRvcnkuZmluZEJ5SWQoMTAwTCkpLnRoZW5SZXR1cm4oT3B0aW9uYWwub2YoY2l0YUd1YXJkYWRhKSk7CgogICAgICAgIC8vIFdIRU4KICAgICAgICBDaXRhIHJlc3VsdGFkbyA9IGNpdGFTZXJ2aWNlLm9idGVuZXJQb3JJZCgxMDBMKTsKCiAgICAgICAgLy8gVEhFTgogICAgICAgIGFzc2VydE5vdE51bGwocmVzdWx0YWRvKTsKICAgICAgICBhc3NlcnRFcXVhbHMoMTAwTCwgcmVzdWx0YWRvLmdldElkKCkpOwogICAgfQoKICAgIEBUZXN0CiAgICBARGlzcGxheU5hbWUoIkFjdHVhbGl6YXIgY2l0YSBleGl0b3NhbWVudGUiKQogICAgdm9pZCBhY3R1YWxpemFyQ2l0YV9FeGl0bygpIHsKICAgICAgICAvLyBHSVZFTgogICAgICAgIHdoZW4ocmVwb3NpdG9yeS5maW5kQnlJZCgxMDBMKSkudGhlblJldHVybihPcHRpb25hbC5vZihjaXRhR3VhcmRhZGEpKTsKICAgICAgICB3aGVuKHJlcG9zaXRvcnkuc2F2ZShhbnkoQ2l0YS5jbGFzcykpKS50aGVuUmV0dXJuKGNpdGFHdWFyZGFkYSk7CgogICAgICAgIC8vIFdIRU4KICAgICAgICBDaXRhIHJlc3VsdGFkbyA9IGNpdGFTZXJ2aWNlLmFjdHVhbGl6YXJDaXRhKDEwMEwsIGNpdGFSZXF1ZXN0VmFsaWRhKTsKCiAgICAgICAgLy8gVEhFTgogICAgICAgIGFzc2VydE5vdE51bGwocmVzdWx0YWRvKTsKICAgICAgICBhc3NlcnRFcXVhbHMoIk1hbnRlbmltaWVudG8gcHJldmVudGl2byIsIHJlc3VsdGFkby5nZXRNb3Rpdm8oKSk7CiAgICAgICAgdmVyaWZ5KHJlcG9zaXRvcnksIHRpbWVzKDEpKS5zYXZlKGNpdGFHdWFyZGFkYSk7CiAgICB9CgogICAgQFRlc3QKICAgIEBEaXNwbGF5TmFtZSgiRWxpbWluYXIgY2l0YSBleGl0b3NhbWVudGUiKQogICAgdm9pZCBlbGltaW5hckNpdGFfRXhpdG8oKSB7CiAgICAgICAgLy8gR0lWRU4KICAgICAgICB3aGVuKHJlcG9zaXRvcnkuZmluZEJ5SWQoMTAwTCkpLnRoZW5SZXR1cm4oT3B0aW9uYWwub2YoY2l0YUd1YXJkYWRhKSk7CiAgICAgICAgZG9Ob3RoaW5nKCkud2hlbihyZXBvc2l0b3J5KS5kZWxldGUoY2l0YUd1YXJkYWRhKTsKCiAgICAgICAgLy8gV0hFTiAmIFRIRU4KICAgICAgICBhc3NlcnREb2VzTm90VGhyb3coKCkgLT4gY2l0YVNlcnZpY2UuZWxpbWluYXJDaXRhKDEwMEwpKTsKICAgICAgICB2ZXJpZnkocmVwb3NpdG9yeSwgdGltZXMoMSkpLmRlbGV0ZShjaXRhR3VhcmRhZGEpOwogICAgfQp9
+package com.autocare.booking_service.service;
+
+import com.autocare.booking_service.dto.CitaRequestDTO;
+import com.autocare.booking_service.model.Cita;
+import com.autocare.booking_service.repository.CitaRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+public class CitaServiceTest {
+
+    // ✅ CORRECCIÓN: nombre cambiado de "citaRepository" a "repository"
+    // para coincidir con el campo en CitaService.java
+    @Mock
+    private CitaRepository repository;
+
+    @InjectMocks
+    private CitaService citaService;
+
+    private CitaRequestDTO citaRequestValida;
+    private Cita citaGuardada;
+
+    @BeforeEach
+    void setUp() {
+        citaRequestValida = new CitaRequestDTO(
+                1L,
+                10L,
+                LocalDateTime.of(2026, 10, 15, 10, 30),
+                "Mantenimiento preventivo"
+        );
+
+        citaGuardada = new Cita();
+        citaGuardada.setId(100L);
+        citaGuardada.setClienteId(1L);
+        citaGuardada.setVehiculoId(10L);
+        citaGuardada.setFechaHora(LocalDateTime.of(2026, 10, 15, 10, 30));
+        citaGuardada.setEstado(Cita.EstadoCita.AGENDADA);
+    }
+
+    @Test
+    @DisplayName("Agendar Cita - Camino Feliz (Éxito)")
+    void agendarCita_Exito() {
+        // GIVEN
+        when(repository.countByFecha(any())).thenReturn(5L);
+        when(repository.existsByFechaAndHora(any(), any())).thenReturn(false);
+        when(repository.save(any(Cita.class))).thenReturn(citaGuardada);
+
+        // WHEN
+        Cita resultado = citaService.agendarCita(citaRequestValida);
+
+        // THEN
+        assertNotNull(resultado);
+        assertEquals(Cita.EstadoCita.AGENDADA, resultado.getEstado());
+        assertEquals(100L, resultado.getId());
+        verify(repository, times(1)).save(any(Cita.class));
+    }
+
+    @Test
+    @DisplayName("Validación RN-04: Rechazar agendamiento si supera 20 citas diarias")
+    void agendarCita_LanzaExcepcion_PorLimiteDiario() {
+        // GIVEN
+        when(repository.countByFecha(citaRequestValida.fechaHora().toLocalDate())).thenReturn(20L);
+
+        // WHEN & THEN
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            citaService.agendarCita(citaRequestValida);
+        });
+
+        assertTrue(exception.getMessage().contains("Límite de 20 citas diarias alcanzado"));
+        verify(repository, never()).save(any(Cita.class));
+    }
+
+    @Test
+    @DisplayName("Validación RN-03: Rechazar agendamiento por choque de horario")
+    void agendarCita_LanzaExcepcion_PorChoqueDeHorario() {
+        // GIVEN
+        when(repository.countByFecha(citaRequestValida.fechaHora().toLocalDate())).thenReturn(10L);
+        when(repository.existsByFechaAndHora(
+                citaRequestValida.fechaHora().toLocalDate(),
+                citaRequestValida.fechaHora().toLocalTime())).thenReturn(true);
+
+        // WHEN & THEN
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            citaService.agendarCita(citaRequestValida);
+        });
+
+        assertTrue(exception.getMessage().contains("Ya existe una cita agendada en ese horario"));
+        verify(repository, never()).save(any(Cita.class));
+    }
+
+    @Test
+    @DisplayName("Validación RN-05: Actualizar estado de cita exitosamente")
+    void actualizarEstado_Exito() {
+        // GIVEN
+        when(repository.findById(100L)).thenReturn(Optional.of(citaGuardada));
+        when(repository.save(any(Cita.class))).thenReturn(citaGuardada);
+
+        // WHEN
+        Cita resultado = citaService.cambiarEstado(100L, "CONFIRMADA");
+
+        // THEN
+        assertEquals(Cita.EstadoCita.CONFIRMADA, resultado.getEstado());
+        verify(repository, times(1)).save(citaGuardada);
+    }
+
+    @Test
+    @DisplayName("Buscar por ID - Lanza excepción si no existe")
+    void buscarPorId_LanzaExcepcion_NoEncontrada() {
+        // GIVEN
+        when(repository.findById(999L)).thenReturn(Optional.empty());
+
+        // WHEN & THEN
+        assertThrows(RuntimeException.class, () -> {
+            citaService.obtenerPorId(999L);
+        });
+    }
+
+    @Test
+    @DisplayName("Obtener todas las citas")
+    void obtenerTodas() {
+        // GIVEN
+        when(repository.findAll()).thenReturn(List.of(citaGuardada));
+
+        // WHEN
+        var resultado = citaService.obtenerTodas();
+
+        // THEN
+        assertFalse(resultado.isEmpty());
+        verify(repository, times(1)).findAll();
+    }
+
+    @Test
+    @DisplayName("Buscar por ID - Camino Feliz (Éxito)")
+    void buscarPorId_Exito() {
+        // GIVEN
+        when(repository.findById(100L)).thenReturn(Optional.of(citaGuardada));
+
+        // WHEN
+        Cita resultado = citaService.obtenerPorId(100L);
+
+        // THEN
+        assertNotNull(resultado);
+        assertEquals(100L, resultado.getId());
+    }
+
+    @Test
+    @DisplayName("Actualizar cita exitosamente")
+    void actualizarCita_Exito() {
+        // GIVEN
+        when(repository.findById(100L)).thenReturn(Optional.of(citaGuardada));
+        when(repository.save(any(Cita.class))).thenReturn(citaGuardada);
+
+        // WHEN
+        Cita resultado = citaService.actualizarCita(100L, citaRequestValida);
+
+        // THEN
+        assertNotNull(resultado);
+        assertEquals("Mantenimiento preventivo", resultado.getMotivo());
+        verify(repository, times(1)).save(citaGuardada);
+    }
+
+    @Test
+    @DisplayName("Eliminar cita exitosamente")
+    void eliminarCita_Exito() {
+        // GIVEN
+        when(repository.findById(100L)).thenReturn(Optional.of(citaGuardada));
+        doNothing().when(repository).delete(citaGuardada);
+
+        // WHEN & THEN
+        assertDoesNotThrow(() -> citaService.eliminarCita(100L));
+        verify(repository, times(1)).delete(citaGuardada);
+    }
+}

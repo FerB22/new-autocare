@@ -1,5 +1,6 @@
 package com.autocare.booking_service.controller;
 
+import com.autocare.booking_service.assembler.CitaModelAssembler;
 import com.autocare.booking_service.dto.CitaRequestDTO;
 import com.autocare.booking_service.model.Cita;
 import com.autocare.booking_service.service.CitaService;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -23,6 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CitaController.class)
+@Import(CitaModelAssembler.class)
 class CitaControllerTest {
 
     @Autowired
@@ -58,7 +61,9 @@ class CitaControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$._links.self.href").exists())
+                .andExpect(jsonPath("$._links.todas-las-citas.href").exists());
     }
 
     @Test
@@ -67,7 +72,9 @@ class CitaControllerTest {
 
         mockMvc.perform(get("/api/reservas/citas/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$._links.self.href").exists())
+                .andExpect(jsonPath("$._links.todas-las-citas.href").exists());
     }
 
     @Test
@@ -75,7 +82,10 @@ class CitaControllerTest {
         when(citaService.obtenerTodas()).thenReturn(List.of(citaBase));
 
         mockMvc.perform(get("/api/reservas/citas"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.citaList").isArray())
+                .andExpect(jsonPath("$._embedded.citaList[0].id").value(1))
+                .andExpect(jsonPath("$._links.self.href").exists());
     }
 
     @Test
@@ -86,7 +96,9 @@ class CitaControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$._links.self.href").exists())
+                .andExpect(jsonPath("$._links.todas-las-citas.href").exists());
     }
 
     @Test
