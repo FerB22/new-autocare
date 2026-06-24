@@ -45,8 +45,13 @@ public class CitaServiceTest {
         citaGuardada.setClienteId(1L);
         citaGuardada.setVehiculoId(10L);
         citaGuardada.setFechaHora(LocalDateTime.of(2026, 10, 15, 10, 30));
+        citaGuardada.setMotivo("Mantenimiento preventivo");
         citaGuardada.setEstado(Cita.EstadoCita.AGENDADA);
     }
+
+    // =====================================================
+    // agendarCita()
+    // =====================================================
 
     @Test
     @DisplayName("Agendar Cita - Camino Feliz (Éxito)")
@@ -70,7 +75,8 @@ public class CitaServiceTest {
     @DisplayName("Validación RN-04: Rechazar agendamiento si supera 20 citas diarias")
     void agendarCita_LanzaExcepcion_PorLimiteDiario() {
         // GIVEN
-        when(repository.countByFecha(citaRequestValida.fechaHora().toLocalDate())).thenReturn(20L);
+        when(repository.countByFecha(citaRequestValida.fechaHora().toLocalDate()))
+                .thenReturn(20L);
 
         // WHEN & THEN
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
@@ -85,10 +91,12 @@ public class CitaServiceTest {
     @DisplayName("Validación RN-03: Rechazar agendamiento por choque de horario")
     void agendarCita_LanzaExcepcion_PorChoqueDeHorario() {
         // GIVEN
-        when(repository.countByFecha(citaRequestValida.fechaHora().toLocalDate())).thenReturn(10L);
+        when(repository.countByFecha(citaRequestValida.fechaHora().toLocalDate()))
+                .thenReturn(10L);
         when(repository.existsByFechaAndHora(
                 citaRequestValida.fechaHora().toLocalDate(),
-                citaRequestValida.fechaHora().toLocalTime())).thenReturn(true);
+                citaRequestValida.fechaHora().toLocalTime()))
+                .thenReturn(true);
 
         // WHEN & THEN
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
@@ -100,45 +108,24 @@ public class CitaServiceTest {
     }
 
     @Test
-    @DisplayName("Validación RN-05: Actualizar estado de cita exitosamente")
-    void actualizarEstado_Exito() {
-        // GIVEN
-        when(repository.findById(100L)).thenReturn(Optional.of(citaGuardada));
+    @DisplayName("Agendar Cita - Límite de citas es exactamente 19 (aún permitido)")
+    void agendarCita_Exito_ConExactamente19CitasDelDia() {
+        // GIVEN — 19 citas, todavía bajo el límite de 20
+        when(repository.countByFecha(any())).thenReturn(19L);
+        when(repository.existsByFechaAndHora(any(), any())).thenReturn(false);
         when(repository.save(any(Cita.class))).thenReturn(citaGuardada);
 
         // WHEN
-        Cita resultado = citaService.cambiarEstado(100L, "CONFIRMADA");
+        Cita resultado = citaService.agendarCita(citaRequestValida);
 
         // THEN
-        assertEquals(Cita.EstadoCita.CONFIRMADA, resultado.getEstado());
-        verify(repository, times(1)).save(citaGuardada);
+        assertNotNull(resultado);
+        verify(repository, times(1)).save(any(Cita.class));
     }
 
-    @Test
-    @DisplayName("Buscar por ID - Lanza excepción si no existe")
-    void buscarPorId_LanzaExcepcion_NoEncontrada() {
-        // GIVEN
-        when(repository.findById(999L)).thenReturn(Optional.empty());
-
-        // WHEN & THEN
-        assertThrows(RuntimeException.class, () -> {
-            citaService.obtenerPorId(999L);
-        });
-    }
-
-    @Test
-    @DisplayName("Obtener todas las citas")
-    void obtenerTodas() {
-        // GIVEN
-        when(repository.findAll()).thenReturn(List.of(citaGuardada));
-
-        // WHEN
-        var resultado = citaService.obtenerTodas();
-
-        // THEN
-        assertFalse(resultado.isEmpty());
-        verify(repository, times(1)).findAll();
-    }
+    // =====================================================
+    // obtenerPorId()
+    // =====================================================
 
     @Test
     @DisplayName("Buscar por ID - Camino Feliz (Éxito)")
@@ -152,10 +139,131 @@ public class CitaServiceTest {
         // THEN
         assertNotNull(resultado);
         assertEquals(100L, resultado.getId());
+        verify(repository, times(1)).findById(100L);
     }
 
     @Test
-    @DisplayName("Actualizar cita exitosamente")
+    @DisplayName("Buscar por ID - Lanza excepción si no existe")
+    void buscarPorId_LanzaExcepcion_NoEncontrada() {
+        // GIVEN
+        when(repository.findById(999L)).thenReturn(Optional.empty());
+
+        // WHEN & THEN
+        assertThrows(RuntimeException.class, () -> {
+            citaService.obtenerPorId(999L);
+        });
+
+        verify(repository, times(1)).findById(999L);
+    }
+
+    // =====================================================
+    // obtenerTodas()
+    // =====================================================
+
+    @Test
+    @DisplayName("Obtener todas las citas - Lista con resultados")
+    void obtenerTodas_RetornaLista() {
+        // GIVEN
+        when(repository.findAll()).thenReturn(List.of(citaGuardada));
+
+        // WHEN
+        var resultado = citaService.obtenerTodas();
+
+        // THEN
+        assertFalse(resultado.isEmpty());
+        assertEquals(1, resultado.size());
+        verify(repository, times(1)).findAll();
+    }
+
+    @Test
+    @DisplayName("Obtener todas las citas - Lista vacía")
+    void obtenerTodas_RetornaListaVacia() {
+        // GIVEN
+        when(repository.findAll()).thenReturn(List.of());
+
+        // WHEN
+        var resultado = citaService.obtenerTodas();
+
+        // THEN
+        assertNotNull(resultado);
+        assertTrue(resultado.isEmpty());
+        verify(repository, times(1)).findAll();
+    }
+
+    // =====================================================
+    // obtenerCitasPorVehiculo()  ← agrega este método en CitaService
+    // =====================================================
+
+    @Test
+    @DisplayName("Obtener citas por vehículo - Retorna lista con citas")
+    void obtenerCitasPorVehiculo_Exito() {
+        // GIVEN
+        when(repository.findByVehiculoId(10L)).thenReturn(List.of(citaGuardada));
+
+        // WHEN
+        List<Cita> resultado = citaService.obtenerCitasPorVehiculo(10L);
+
+        // THEN
+        assertFalse(resultado.isEmpty());
+        assertEquals(1, resultado.size());
+        assertEquals(10L, resultado.get(0).getVehiculoId());
+        verify(repository, times(1)).findByVehiculoId(10L);
+    }
+
+    @Test
+    @DisplayName("Obtener citas por vehículo - Retorna lista vacía si no tiene citas")
+    void obtenerCitasPorVehiculo_RetornaListaVacia() {
+        // GIVEN
+        when(repository.findByVehiculoId(99L)).thenReturn(List.of());
+
+        // WHEN
+        List<Cita> resultado = citaService.obtenerCitasPorVehiculo(99L);
+
+        // THEN
+        assertNotNull(resultado);
+        assertTrue(resultado.isEmpty());
+        verify(repository, times(1)).findByVehiculoId(99L);
+    }
+
+    // =====================================================
+    // cambiarEstado()
+    // =====================================================
+
+    @Test
+    @DisplayName("Cambiar estado - Camino Feliz (Éxito)")
+    void cambiarEstado_Exito() {
+        // GIVEN
+        when(repository.findById(100L)).thenReturn(Optional.of(citaGuardada));
+        when(repository.save(any(Cita.class))).thenReturn(citaGuardada);
+
+        // WHEN
+        Cita resultado = citaService.cambiarEstado(100L, "CONFIRMADA");
+
+        // THEN
+        assertEquals(Cita.EstadoCita.CONFIRMADA, resultado.getEstado());
+        verify(repository, times(1)).save(citaGuardada);
+    }
+
+    @Test
+    @DisplayName("Cambiar estado - Lanza excepción si cita no existe")
+    void cambiarEstado_LanzaExcepcion_NoEncontrada() {
+        // GIVEN
+        when(repository.findById(999L)).thenReturn(Optional.empty());
+
+        // WHEN & THEN
+        assertThrows(RuntimeException.class, () -> {
+            citaService.cambiarEstado(999L, "CONFIRMADA");
+        });
+
+        verify(repository, never()).save(any(Cita.class));
+    }
+
+    // =====================================================
+    // actualizarCita()
+    // =====================================================
+
+    @Test
+    @DisplayName("Actualizar cita - Camino Feliz (Éxito)")
     void actualizarCita_Exito() {
         // GIVEN
         when(repository.findById(100L)).thenReturn(Optional.of(citaGuardada));
@@ -171,7 +279,25 @@ public class CitaServiceTest {
     }
 
     @Test
-    @DisplayName("Eliminar cita exitosamente")
+    @DisplayName("Actualizar cita - Lanza excepción si cita no existe")
+    void actualizarCita_LanzaExcepcion_NoEncontrada() {
+        // GIVEN
+        when(repository.findById(999L)).thenReturn(Optional.empty());
+
+        // WHEN & THEN
+        assertThrows(RuntimeException.class, () -> {
+            citaService.actualizarCita(999L, citaRequestValida);
+        });
+
+        verify(repository, never()).save(any(Cita.class));
+    }
+
+    // =====================================================
+    // eliminarCita()
+    // =====================================================
+
+    @Test
+    @DisplayName("Eliminar cita - Camino Feliz (Éxito)")
     void eliminarCita_Exito() {
         // GIVEN
         when(repository.findById(100L)).thenReturn(Optional.of(citaGuardada));
@@ -180,5 +306,19 @@ public class CitaServiceTest {
         // WHEN & THEN
         assertDoesNotThrow(() -> citaService.eliminarCita(100L));
         verify(repository, times(1)).delete(citaGuardada);
+    }
+
+    @Test
+    @DisplayName("Eliminar cita - Lanza excepción si cita no existe")
+    void eliminarCita_LanzaExcepcion_NoEncontrada() {
+        // GIVEN
+        when(repository.findById(999L)).thenReturn(Optional.empty());
+
+        // WHEN & THEN
+        assertThrows(RuntimeException.class, () -> {
+            citaService.eliminarCita(999L);
+        });
+
+        verify(repository, never()).delete(any(Cita.class));
     }
 }

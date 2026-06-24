@@ -1,32 +1,52 @@
+# Configuración del servidor y puerto donde correrá la aplicación
+# PORT: variable de entorno opcional, por defecto 8081
 server:
   port: ${PORT:8081}
 
+# Configuración de Spring Boot
 spring:
+  # Nombre de la aplicación en el contexto de Spring/Eureka
   application:
     name: garage-service
+  # Configuración de la fuente de datos (base de datos)
   datasource:
+    # DB_URL: url de conexión JDBC, por defecto apunta a una BD Postgres local
     url: ${DB_URL:jdbc:postgresql://localhost:5432/autocare_garage}
+    # DB_USER: usuario de la BD, por defecto 'postgres'
     username: ${DB_USER:postgres}
+    # DB_PASSWORD: contraseña de la BD, por defecto 'admin'
     password: ${DB_PASSWORD:admin}
+  # Configuración de JPA/Hibernate
   jpa:
     hibernate:
+      # ddl-auto controla creación/actualización de esquema: 'update' por defecto
       ddl-auto: update
+    # Mostrar consultas SQL en consola
     show-sql: true
     properties:
       hibernate:
+        # Formatear SQL al mostrarlo
         format_sql: true
+        # Dialecto de Hibernate para PostgreSQL
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
+# Configuración de Eureka (servicio de descubrimiento)
 eureka:
   client:
     serviceUrl:
+      # EUREKA_URI: URL del servidor Eureka, por defecto localhost:8761/eureka
       defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
   instance:
+    # Preferir la dirección IP en la instancia registrada en Eureka
     prefer-ip-address: true
 
+# Configuración de SpringDoc / Swagger para documentación de la API
 springdoc:
   api-docs:
+    # Habilitar generación de OpenAPI/Swagger JSON
     enabled: true
   swagger-ui:
+    # Habilitar interfaz Swagger UI
     enabled: true
+    # Ruta donde estará disponible la UI de Swagger
     path: /doc/swagger-ui.html

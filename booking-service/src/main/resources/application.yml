@@ -1,37 +1,45 @@
+# Configuración del servidor
 server:
-  port: ${PORT:8085}
-  forward-headers-strategy: framework
+  port: ${PORT:8085} # Puerto del servidor (por defecto 8085)
+  forward-headers-strategy: framework # Estrategia para headers reenviados
 
+# Configuración de Spring
 spring:
   application:
-    name: booking-service
+    name: booking-service # Nombre de la aplicación
+  # Configuración de base de datos
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/autocare_booking}
-    username: ${DB_USER:postgres}
-    password: ${DB_PASSWORD:admin}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/autocare_booking} # URL de conexión PostgreSQL
+    username: ${DB_USER:postgres} # Usuario de BD (por defecto postgres)
+    password: ${DB_PASSWORD:admin} # Contraseña de BD (por defecto admin)
+  # Configuración de JPA/Hibernate
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: update # Auto-actualizar el esquema de BD
+    show-sql: true # Mostrar queries SQL en logs
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect # Dialecto para PostgreSQL
+  # Configuración de Cloud
   cloud:
     compatibility-verifier:
-      enabled: false
+      enabled: false # Verificador de compatibilidad deshabilitado
+  # Configuración de MVC
   mvc:
     pathmatch:
-      matching-strategy: ant_path_matcher
+      matching-strategy: ant_path_matcher # Estrategia de matching de rutas
 
+# Configuración de Eureka (Service Discovery)
 eureka:
   client:
     serviceUrl:
-      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka} # URL del servidor Eureka
 
+# Configuración de SpringDoc (OpenAPI/Swagger)
 springdoc:
   api-docs:
-    enabled: true
+    enabled: true # Habilitar documentación API
   swagger-ui:
-    enabled: true
-    path: /doc/swagger-ui.html
-  hateoasRestHandlerMappingEnabled: false
+    enabled: true # Habilitar interfaz Swagger UI
+    path: /doc/swagger-ui.html # Ruta de acceso a Swagger UI
+  hateoasRestHandlerMappingEnabled: false # HATEOAS deshabilitado
