@@ -10,12 +10,12 @@ spring:
     name: garage-service
   # Configuración de la fuente de datos (base de datos)
   datasource:
-    # DB_URL: url de conexión JDBC, por defecto apunta a una BD Postgres local
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/autocare_garage}
-    # DB_USER: usuario de la BD, por defecto 'postgres'
-    username: ${DB_USER:postgres}
-    # DB_PASSWORD: contraseña de la BD, por defecto 'admin'
-    password: ${DB_PASSWORD:admin}
+    # DB_URL: url de conexión JDBC, por defecto apunta a la BD Postgres en Render
+    url: ${DB_URL:jdbc:postgresql://dpg-d8putpdckfvc73ajon7g-a.virginia-postgres.render.com:5432/postgres_hhxs}
+    # DB_USER: usuario de la BD
+    username: ${DB_USER:postgres_hhxs_user}
+    # DB_PASSWORD: contraseña de la BD
+    password: ${DB_PASSWORD:aSaj5hOjbLj1lLTMqFpOuluptVKtgZ0e}
   # Configuración de JPA/Hibernate
   jpa:
     hibernate:
