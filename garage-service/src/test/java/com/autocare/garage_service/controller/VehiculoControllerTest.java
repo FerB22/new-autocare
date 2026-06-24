@@ -306,7 +306,7 @@ class GarageControllerTest {
         mockMvc.perform(put(VEHICULO_URL + "/{vehiculoId}", 1L, 99L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(vehiculoDTO)))
-            .andExpect(status().is5xxServerError());
+            .andExpect(status().isBadRequest());
     }
 
     // =====================================================
@@ -335,6 +335,6 @@ class GarageControllerTest {
 
         // WHEN & THEN
         mockMvc.perform(delete(VEHICULO_URL + "/{vehiculoId}", 1L, 99L))
-            .andExpect(status().is5xxServerError());
+            .andExpect(status().isBadRequest());
     }
 }

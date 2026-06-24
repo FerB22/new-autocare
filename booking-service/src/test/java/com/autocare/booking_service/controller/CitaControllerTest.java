@@ -89,7 +89,7 @@ class CitaControllerTest {
         mockMvc.perform(post("/api/reservas/citas")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isConflict());
     }
 
     @Test
@@ -103,7 +103,7 @@ class CitaControllerTest {
         mockMvc.perform(post("/api/reservas/citas")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isConflict());
     }
 
     // =====================================================
