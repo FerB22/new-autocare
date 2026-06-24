@@ -16,20 +16,39 @@ Sistema de microservicios para la gestión integral de un taller mecánico autom
 
 ## 🧩 Microservicios e Infraestructura
 
-| Servicio                | Puerto | Descripción                                      |
-|-------------------------|--------|--------------------------------------------------|
-| `eureka-server`         | 8761   | Registro y descubrimiento de servicios           |
-| `api-gateway`           | 8080   | Puerta de entrada única y enrutamiento           |
-| `garage-service`        | 8081   | Gestión unificada de clientes y vehículos        |
-| `booking-service`       | 8082   | Agendamiento de citas y reservas                 |
-| `loyalty-service`       | 8083   | Sistema de puntos, niveles y recompensas         |
-| `workshop-service`      | 8084   | Núcleo de operaciones y órdenes de trabajo       |
-| `diagnostics-service`   | 8085   | Historial clínico, telemetría y códigos OBD2     |
-| `hr-service`            | 8086   | Gestión del personal y disponibilidad de mecánicos |
-| `inventory-service`     | 8087   | Control de stock y catálogo de repuestos         |
-| `analytics-service`     | 8088   | Observatorio de métricas y reportes financieros  |
-| `billing-service`       | 8089   | Emisión de facturas y control de pagos           |
-| `procurement-service`   | 8090   | Gestión de proveedores y órdenes de compra       |
+| Servicio                | Puerto | Descripción                                        |
+|-------------------------|--------|----------------------------------------------------|
+| `eureka-server`         | 8761   | Registro y descubrimiento de servicios             |
+| `api-gateway`           | 8080   | Puerta de entrada única y enrutamiento             |
+| `garage-service`        | 8081   | Gestión unificada de clientes y vehículos          |
+| `inventory-service`     | 8082   | Control de stock y catálogo de repuestos           |
+| `hr-service`            | 8083   | Gestión del personal y disponibilidad de mecánicos |
+| `billing-service`       | 8084   | Emisión de facturas y control de pagos             |
+| `booking-service`       | 8085   | Agendamiento de citas y reservas                   |
+| `workshop-service`      | 8086   | Núcleo de operaciones y órdenes de trabajo         |
+| `diagnostics-service`   | 8087   | Historial clínico, telemetría y códigos OBD2       |
+| `loyalty-service`       | 8088   | Sistema de puntos, niveles y recompensas           |
+| `procurement-service`   | 8089   | Gestión de proveedores y órdenes de compra         |
+| `analytics-service`     | 8090   | Observatorio de métricas y reportes financieros    |
+| `notification-service`  | 8091   | Envío y gestión de notificaciones del taller       |
+
+---
+
+## 🌐 Rutas del API Gateway (`http://localhost:8080`)
+
+| Servicio               | Prefijo de ruta Gateway   | Ejemplo de endpoint                          |
+|------------------------|---------------------------|----------------------------------------------|
+| `garage-service`       | `/api/garage/**`          | `/api/garage/clientes`                       |
+| `booking-service`      | `/api/reservas/**`        | `/api/reservas/citas`                        |
+| `loyalty-service`      | `/api/lealtad/**`         | `/api/lealtad`                               |
+| `workshop-service`     | `/api/taller/**`          | `/api/taller`                                |
+| `diagnostics-service`  | `/api/diagnosticos/**`    | `/api/diagnosticos`                          |
+| `hr-service`           | `/api/personal/**`        | `/api/personal`                              |
+| `inventory-service`    | `/api/inventario/**`      | `/api/inventario`                            |
+| `procurement-service`  | `/api/compras/**`         | `/api/compras`                               |
+| `billing-service`      | `/api/facturacion/**`     | `/api/facturacion`                           |
+| `analytics-service`    | `/api/metricas/**`        | `/api/metricas`                              |
+| `notification-service` | `/api/notificaciones/**`  | `/api/notificaciones`                        |
 
 ---
 
@@ -150,7 +169,7 @@ El plan de pruebas completo y detallado se encuentra en el archivo dedicado **[T
 
 ### Alcance y Enfoque
 
-Las pruebas unitarias cubren la capa de servicio (`CitaService`) del módulo `booking-service`, que concentra la mayor densidad de reglas de negocio críticas del sistema. Las dependencias externas (repositorio JPA y cliente WebClient hacia `fleet-service` y `customer-service`) son reemplazadas por **dobles de prueba (mocks)** usando **Mockito**, de modo que cada test valide una sola unidad de lógica en completo aislamiento.
+Las pruebas unitarias cubren la capa de servicio (`CitaService`) del módulo `booking-service`, que concentra la mayor densidad de reglas de negocio críticas del sistema. Las dependencias externas (repositorio JPA y cliente WebClient hacia `garage-service`) son reemplazadas por **dobles de prueba (mocks)** usando **Mockito**, de modo que cada test valide una sola unidad de lógica en completo aislamiento.
 
 ### Reglas Críticas Bajo Cobertura
 
