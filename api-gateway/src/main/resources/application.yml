@@ -56,7 +56,12 @@ spring:
         - id: analytics-service
           uri: lb://analytics-service
           predicates:
-            - Path=/api/reportes/**
+            - Path=/api/metricas/**
+
+        - id: notification-service
+          uri: lb://notification-service
+          predicates:
+            - Path=/api/notificaciones/**
 
 server:
   port: ${PORT:8080}
