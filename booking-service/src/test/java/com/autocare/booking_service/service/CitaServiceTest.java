@@ -22,8 +22,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class CitaServiceTest {
 
-    // ✅ CORRECCIÓN: nombre cambiado de "citaRepository" a "repository"
-    // para coincidir con el campo en CitaService.java
     @Mock
     private CitaRepository repository;
 

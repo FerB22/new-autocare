@@ -68,4 +68,8 @@ public class CitaService {
         Cita citaExistente = obtenerPorId(id);
         repository.delete(citaExistente);
     }
+
+    public List<Cita> obtenerCitasPorVehiculo(Long vehiculoId) {
+        return repository.findByVehiculoId(vehiculoId);
+    }
 }
