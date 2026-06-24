@@ -19,21 +19,22 @@ public class GarageService {
 
     private final ClienteRepository clienteRepository;
     private final VehiculoRepository vehiculoRepository;
-    private final LoyaltyClient loyaltyClient; // Inyectamos el emisario
+    private final LoyaltyClient loyaltyClient;
 
     public Cliente registrarCliente(ClienteRequestDTO dto) {
         if (clienteRepository.findByDocumentoIdentidad(dto.documentoIdentidad()).isPresent()) {
             throw new RuntimeException("El cliente con este documento ya existe");
         }
 
-        Cliente nuevoCliente = new Cliente(
-                null, dto.documentoIdentidad(), dto.nombre(), 
-                dto.apellido(), dto.email(), dto.telefono(), null
-        );
-        // 1. Guardamos al humano en la BD local de autocare_garage
-        Cliente clienteGuardado = clienteRepository.save(nuevoCliente);
+        // Usamos setters para no pisar el new ArrayList<>() de la entidad
+        Cliente nuevoCliente = new Cliente();
+        nuevoCliente.setDocumentoIdentidad(dto.documentoIdentidad());
+        nuevoCliente.setNombre(dto.nombre());
+        nuevoCliente.setApellido(dto.apellido());
+        nuevoCliente.setEmail(dto.email());
+        nuevoCliente.setTelefono(dto.telefono());
 
-        // 2. Disparamos la señal espacial síncrona hacia el loyalty-service
+        Cliente clienteGuardado = clienteRepository.save(nuevoCliente);
         loyaltyClient.inicializarPerfilLealtad(clienteGuardado.getId());
 
         return clienteGuardado;
@@ -60,8 +61,75 @@ public class GarageService {
         return clienteRepository.findById(clienteId)
                 .orElseThrow(() -> new RuntimeException("Perfil de cliente no encontrado"));
     }
-    
+
     public List<Cliente> obtenerTodosLosClientes() {
         return clienteRepository.findAll();
+    }
+
+    // ── NUEVOS MÉTODOS ──────────────────────────────────────────────────────────
+
+    @Transactional
+    public Cliente actualizarCliente(Long id, ClienteRequestDTO dto) {
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado en el sistema"));
+
+        clienteRepository.findByDocumentoIdentidad(dto.documentoIdentidad())
+                .ifPresent(existente -> {
+                    if (!existente.getId().equals(id)) {
+                        throw new RuntimeException("El documento ya pertenece a otro cliente registrado");
+                    }
+                });
+
+        cliente.setDocumentoIdentidad(dto.documentoIdentidad());
+        cliente.setNombre(dto.nombre());
+        cliente.setApellido(dto.apellido());
+        cliente.setEmail(dto.email());
+        cliente.setTelefono(dto.telefono());
+
+        return clienteRepository.save(cliente);
+    }
+
+    @Transactional
+    public void eliminarCliente(Long id) {
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado en el sistema"));
+
+        clienteRepository.delete(cliente);
+    }
+
+    @Transactional
+    public Vehiculo actualizarVehiculo(Long clienteId, Long vehiculoId, VehiculoRequestDTO dto) {
+        clienteRepository.findById(clienteId)
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado en el sistema"));
+
+        Vehiculo vehiculo = vehiculoRepository.findById(vehiculoId)
+                .orElseThrow(() -> new RuntimeException("Vehículo no encontrado en el garage"));
+
+        vehiculoRepository.findByPatente(dto.patente())
+                .ifPresent(existente -> {
+                    if (!existente.getId().equals(vehiculoId)) {
+                        throw new RuntimeException("La patente ya está registrada en otro vehículo");
+                    }
+                });
+
+        vehiculo.setPatente(dto.patente());
+        vehiculo.setMarca(dto.marca());
+        vehiculo.setModelo(dto.modelo());
+        vehiculo.setAnio(dto.anio());
+        vehiculo.setColor(dto.color());
+        vehiculo.setVin(dto.vin());
+
+        return vehiculoRepository.save(vehiculo);
+    }
+
+    @Transactional
+    public void eliminarVehiculo(Long clienteId, Long vehiculoId) {
+        clienteRepository.findById(clienteId)
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado en el sistema"));
+
+        Vehiculo vehiculo = vehiculoRepository.findById(vehiculoId)
+                .orElseThrow(() -> new RuntimeException("Vehículo no encontrado en el garage"));
+
+        vehiculoRepository.delete(vehiculo);
     }
 }
