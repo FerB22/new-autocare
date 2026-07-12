@@ -2,6 +2,9 @@ server:
   port: ${PORT:8088}
 
 spring:
+  cloud:
+    compatibility-verifier:
+      enabled: false
   application:
     name: loyalty-service
   datasource:

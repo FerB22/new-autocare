@@ -2,6 +2,9 @@ server:
   port: ${PORT:8089}
 
 spring:
+  cloud:
+    compatibility-verifier:
+      enabled: false
   application:
     name: procurement-service
   datasource:

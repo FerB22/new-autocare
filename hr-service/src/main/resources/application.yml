@@ -2,6 +2,9 @@ server:
   port: ${PORT:8083} # Usa el puerto asignado o el 8083 en local
 
 spring:
+  cloud:
+    compatibility-verifier:
+      enabled: false
   application:
     name: hr-service
   datasource:

@@ -66,6 +66,17 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Captura las ResponseStatusException explícitas (por ejemplo, validaciones fallidas
+     * arrojadas manualmente con un HTTP 400 u otro estado).
+     */
+    @ExceptionHandler(org.springframework.web.server.ResponseStatusException.class)
+    public ResponseEntity<Map<String, String>> handleResponseStatusException(
+            org.springframework.web.server.ResponseStatusException ex) {
+        return ResponseEntity.status(ex.getStatusCode())
+                .body(Map.of("error", ex.getReason() != null ? ex.getReason() : "Error en la petición"));
+    }
+
+    /**
      * Captura RuntimeException generales no manejadas específicamente.
      * - Errores inesperados del servicio (BD caída, llamadas externas fallidas).
      * - Devuelve 500 Internal Server Error para no exponer detalles técnicos.

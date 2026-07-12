@@ -2,6 +2,9 @@ server:
   port: ${PORT:8091} # Asignamos el 8091 por defecto para local
 
 spring:
+  cloud:
+    compatibility-verifier:
+      enabled: false
   application:
     name: notification-service
   datasource:

@@ -2,6 +2,9 @@ server:
   port: ${PORT:8090}
 
 spring:
+  cloud:
+    compatibility-verifier:
+      enabled: false
   application:
     name: analytics-service
   datasource:

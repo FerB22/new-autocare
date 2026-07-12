@@ -2,6 +2,9 @@ server:
   port: ${PORT:8084} # Usa el puerto asignado o el 8084 en local
 
 spring:
+  cloud:
+    compatibility-verifier:
+      enabled: false
   application:
     name: billing-service
   datasource:

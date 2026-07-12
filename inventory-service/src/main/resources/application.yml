@@ -2,6 +2,9 @@ server:
   port: ${PORT:8082} # Usa el puerto asignado o el 8082 en local
 
 spring:
+  cloud:
+    compatibility-verifier:
+      enabled: false
   application:
     name: inventory-service
   datasource:
