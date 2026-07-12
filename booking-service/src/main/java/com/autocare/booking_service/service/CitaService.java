@@ -5,24 +5,42 @@ import com.autocare.booking_service.dto.CitaRequestDTO;
 import com.autocare.booking_service.exception.CitaNoEncontradaException;
 import com.autocare.booking_service.model.Cita;
 import com.autocare.booking_service.repository.CitaRepository;
+import com.autocare.booking_service.client.GarageClient;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CitaService {
 
     private final CitaRepository repository;
+    private final GarageClient garageClient;
 
     public List<Cita> obtenerTodas() {
         return repository.findAll();
     }
 
     public Cita agendarCita(CitaRequestDTO dto) {
+        log.info("Intento de agendamiento para vehículo {} en fecha {}", dto.vehiculoId(), dto.fechaHora());
+
+        // Validar existencia de cliente y vehículo (RN-01)
+        if (!garageClient.existeCliente(dto.clienteId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El cliente no existe en el sistema.");
+        }
+        if (!garageClient.existeVehiculo(dto.vehiculoId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El vehículo no existe en el sistema.");
+        }
+
         // Validar límite diario (RN-04): Máximo 20 citas
         long citasDelDia = repository.countByFecha(dto.fechaHora().toLocalDate());
         if (citasDelDia >= 20) {
+            log.warn("Límite diario alcanzado para la fecha {}", dto.fechaHora().toLocalDate());
             throw new HorarioOcupadoException("Límite de 20 citas diarias alcanzado. Intente con otra fecha.");
         }
 
@@ -39,7 +57,9 @@ public class CitaService {
         cita.setMotivo(dto.motivo());
         cita.setEstado(Cita.EstadoCita.AGENDADA);
         
-        return repository.save(cita);
+        Cita citaGuardada = repository.save(cita);
+        log.info("Cita {} agendada exitosamente con ID {}", citaGuardada.getMotivo(), citaGuardada.getId());
+        return citaGuardada;
     }
 
     public Cita obtenerPorId(Long id) {

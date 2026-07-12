@@ -3,6 +3,8 @@ package com.autocare.booking_service.service;
 import com.autocare.booking_service.dto.CitaRequestDTO;
 import com.autocare.booking_service.model.Cita;
 import com.autocare.booking_service.repository.CitaRepository;
+import com.autocare.booking_service.client.GarageClient;
+import org.springframework.web.server.ResponseStatusException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,6 +26,9 @@ public class CitaServiceTest {
 
     @Mock
     private CitaRepository repository;
+
+    @Mock
+    private GarageClient garageClient;
 
     @InjectMocks
     private CitaService citaService;
@@ -57,6 +62,8 @@ public class CitaServiceTest {
     @DisplayName("Agendar Cita - Camino Feliz (Éxito)")
     void agendarCita_Exito() {
         // GIVEN
+        when(garageClient.existeCliente(anyLong())).thenReturn(true);
+        when(garageClient.existeVehiculo(anyLong())).thenReturn(true);
         when(repository.countByFecha(any())).thenReturn(5L);
         when(repository.existsByFechaAndHora(any(), any())).thenReturn(false);
         when(repository.save(any(Cita.class))).thenReturn(citaGuardada);
@@ -75,6 +82,8 @@ public class CitaServiceTest {
     @DisplayName("Validación RN-04: Rechazar agendamiento si supera 20 citas diarias")
     void agendarCita_LanzaExcepcion_PorLimiteDiario() {
         // GIVEN
+        when(garageClient.existeCliente(anyLong())).thenReturn(true);
+        when(garageClient.existeVehiculo(anyLong())).thenReturn(true);
         when(repository.countByFecha(citaRequestValida.fechaHora().toLocalDate()))
                 .thenReturn(20L);
 
@@ -91,6 +100,8 @@ public class CitaServiceTest {
     @DisplayName("Validación RN-03: Rechazar agendamiento por choque de horario")
     void agendarCita_LanzaExcepcion_PorChoqueDeHorario() {
         // GIVEN
+        when(garageClient.existeCliente(anyLong())).thenReturn(true);
+        when(garageClient.existeVehiculo(anyLong())).thenReturn(true);
         when(repository.countByFecha(citaRequestValida.fechaHora().toLocalDate()))
                 .thenReturn(10L);
         when(repository.existsByFechaAndHora(
@@ -111,6 +122,8 @@ public class CitaServiceTest {
     @DisplayName("Agendar Cita - Límite de citas es exactamente 19 (aún permitido)")
     void agendarCita_Exito_ConExactamente19CitasDelDia() {
         // GIVEN — 19 citas, todavía bajo el límite de 20
+        when(garageClient.existeCliente(anyLong())).thenReturn(true);
+        when(garageClient.existeVehiculo(anyLong())).thenReturn(true);
         when(repository.countByFecha(any())).thenReturn(19L);
         when(repository.existsByFechaAndHora(any(), any())).thenReturn(false);
         when(repository.save(any(Cita.class))).thenReturn(citaGuardada);
@@ -121,6 +134,41 @@ public class CitaServiceTest {
         // THEN
         assertNotNull(resultado);
         verify(repository, times(1)).save(any(Cita.class));
+    }
+
+    // =====================================================
+    // agendarCita() - Validación de RN-01
+    // =====================================================
+
+    @Test
+    @DisplayName("Validación RN-01: Rechazar agendamiento si el cliente no existe")
+    void agendarCita_LanzaExcepcion_ClienteNoExiste() {
+        // GIVEN
+        when(garageClient.existeCliente(anyLong())).thenReturn(false);
+
+        // WHEN & THEN
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+            citaService.agendarCita(citaRequestValida);
+        });
+
+        assertTrue(exception.getMessage().contains("El cliente no existe en el sistema"));
+        verify(repository, never()).save(any(Cita.class));
+    }
+
+    @Test
+    @DisplayName("Validación RN-01: Rechazar agendamiento si el vehículo no existe")
+    void agendarCita_LanzaExcepcion_VehiculoNoExiste() {
+        // GIVEN
+        when(garageClient.existeCliente(anyLong())).thenReturn(true);
+        when(garageClient.existeVehiculo(anyLong())).thenReturn(false);
+
+        // WHEN & THEN
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+            citaService.agendarCita(citaRequestValida);
+        });
+
+        assertTrue(exception.getMessage().contains("El vehículo no existe en el sistema"));
+        verify(repository, never()).save(any(Cita.class));
     }
 
     // =====================================================
