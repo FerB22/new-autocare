@@ -1,4 +1,4 @@
-server:
+﻿server:
   port: ${PORT:8090}
 
 spring:
@@ -10,7 +10,9 @@ spring:
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/autocare_analytics}
     username: ${DB_USER:postgres}
-    password: ${DB_PASSWORD:admin}
+    password: ${DB_PASSWORD:admin}
+    hikari:
+      maximum-pool-size: 3
   jpa:
     hibernate:
       ddl-auto: update

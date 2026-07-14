@@ -1,18 +1,20 @@
-# Configuración del servidor
+﻿# ConfiguraciÃ³n del servidor
 server:
   port: ${PORT:8085} # Puerto del servidor (por defecto 8085)
   forward-headers-strategy: framework # Estrategia para headers reenviados
 
-# Configuración de Spring
+# ConfiguraciÃ³n de Spring
 spring:
   application:
-    name: booking-service # Nombre de la aplicación
-  # Configuración de base de datos
+    name: booking-service # Nombre de la aplicaciÃ³n
+  # ConfiguraciÃ³n de base de datos
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/autocare_booking} # URL de conexión PostgreSQL
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/autocare_booking} # URL de conexiÃ³n PostgreSQL
     username: ${DB_USER:postgres} # Usuario de BD (por defecto postgres)
-    password: ${DB_PASSWORD:admin} # Contraseña de BD (por defecto admin)
-  # Configuración de JPA/Hibernate
+    password: ${DB_PASSWORD:admin} # ContraseÃ±a de BD (por defecto admin)
+    hikari:
+      maximum-pool-size: 3
+  # ConfiguraciÃ³n de JPA/Hibernate
   jpa:
     hibernate:
       ddl-auto: update # Auto-actualizar el esquema de BD
@@ -20,25 +22,25 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect # Dialecto para PostgreSQL
-  # Configuración de Cloud
+  # ConfiguraciÃ³n de Cloud
   cloud:
     compatibility-verifier:
       enabled: false # Verificador de compatibilidad deshabilitado
-  # Configuración de MVC
+  # ConfiguraciÃ³n de MVC
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher # Estrategia de matching de rutas
 
-# Configuración de Eureka (Service Discovery)
+# ConfiguraciÃ³n de Eureka (Service Discovery)
 eureka:
   client:
     serviceUrl:
       defaultZone: ${EUREKA_URI:http://localhost:8761/eureka} # URL del servidor Eureka
 
-# Configuración de SpringDoc (OpenAPI/Swagger)
+# ConfiguraciÃ³n de SpringDoc (OpenAPI/Swagger)
 springdoc:
   api-docs:
-    enabled: true # Habilitar documentación API
+    enabled: true # Habilitar documentaciÃ³n API
   swagger-ui:
     enabled: true # Habilitar interfaz Swagger UI
     path: /doc/swagger-ui.html # Ruta de acceso a Swagger UI
