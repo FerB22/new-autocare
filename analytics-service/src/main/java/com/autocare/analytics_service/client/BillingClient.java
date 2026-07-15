@@ -3,7 +3,7 @@ package com.autocare.analytics_service.client;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
+
 import java.math.BigDecimal;
 
 @Slf4j
@@ -11,7 +11,6 @@ import java.math.BigDecimal;
 @RequiredArgsConstructor
 public class BillingClient {
 
-    private final WebClient.Builder webClientBuilder;
 
     public BigDecimal obtenerIngresosDelMes(Integer mes, Integer anio) {
         log.info("Consultando ingresos al billing-service para {}/{}", mes, anio);

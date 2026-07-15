@@ -25,7 +25,7 @@ public class DataLoader implements CommandLineRunner {
             log.info("Iniciando la carga de datos falsos (DataFaker)...");
             
             // Configuramos Faker en español
-            Faker faker = new Faker(new Locale("es"));
+            Faker faker = new Faker(Locale.of("es"));
 
             // Vamos a generar 15 clientes
             for (int i = 0; i < 15; i++) {

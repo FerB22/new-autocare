@@ -24,7 +24,7 @@ public class DataLoader implements CommandLineRunner {
         if (repuestoRepository.count() == 0) {
             log.info("Iniciando la carga de repuestos simulados en bodega...");
             
-            Faker faker = new Faker(new Locale("es"));
+            Faker faker = new Faker(Locale.of("es"));
 
             // Definimos un catálogo inicial realista para un taller
             String[] categorias = {

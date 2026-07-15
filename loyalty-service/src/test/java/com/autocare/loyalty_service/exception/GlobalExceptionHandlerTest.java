@@ -46,6 +46,7 @@ class GlobalExceptionHandlerTest {
         assertEquals(400, respuesta.getBody().get("status"));
         
         // Verificamos que el mapa de errores contenga el campo que falló
+        @SuppressWarnings("unchecked")
         Map<String, String> errores = (Map<String, String>) respuesta.getBody().get("campos");
         assertTrue(errores.containsKey("clienteId"));
         assertEquals("El ID no puede ser nulo", errores.get("clienteId"));

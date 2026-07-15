@@ -5,7 +5,6 @@ import com.autocare.loyalty_service.dto.TransaccionPuntosDTO;
 import com.autocare.loyalty_service.model.PerfilLealtad;
 import com.autocare.loyalty_service.repository.PerfilLealtadRepository;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

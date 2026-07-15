@@ -23,7 +23,7 @@ public class DataLoader implements CommandLineRunner {
         if (mecanicoRepository.count() == 0) {
             log.info("Iniciando la contratación simulada de mecánicos...");
             
-            Faker faker = new Faker(new Locale("es"));
+            Faker faker = new Faker(Locale.of("es"));
 
             // Arreglo con especialidades clásicas de un taller integral
             String[] especialidades = {
