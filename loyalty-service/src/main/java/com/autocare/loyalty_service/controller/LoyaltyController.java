@@ -1,5 +1,6 @@
 package com.autocare.loyalty_service.controller;
 
+import com.autocare.loyalty_service.assembler.PerfilLealtadModelAssembler;
 import com.autocare.loyalty_service.dto.CrearPerfilDTO;
 import com.autocare.loyalty_service.dto.TransaccionPuntosDTO;
 import com.autocare.loyalty_service.model.PerfilLealtad;
@@ -16,9 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
 @RestController
 @RequestMapping("/api/lealtad")
 @RequiredArgsConstructor
@@ -29,6 +27,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class LoyaltyController {
 
     private final LoyaltyService service;
+    private final PerfilLealtadModelAssembler assembler;
 
     @GetMapping("/cliente/{clienteId}")
     @Operation(
@@ -43,11 +42,7 @@ public class LoyaltyController {
             @Parameter(description = "ID del cliente", required = true)
             @PathVariable Long clienteId) {
         PerfilLealtad perfil = service.obtenerPerfil(clienteId);
-        EntityModel<PerfilLealtad> recurso = EntityModel.of(perfil);
-        recurso.add(linkTo(methodOn(LoyaltyController.class).consultarPerfil(clienteId)).withSelfRel());
-        recurso.add(linkTo(methodOn(LoyaltyController.class).agregarPuntos(clienteId, null)).withRel("sumar-puntos"));
-        recurso.add(linkTo(methodOn(LoyaltyController.class).restarPuntos(clienteId, null)).withRel("canjear-puntos"));
-        return ResponseEntity.ok(recurso);
+        return ResponseEntity.ok(assembler.toModel(perfil));
     }
 
     @PostMapping("/cliente")
@@ -61,11 +56,7 @@ public class LoyaltyController {
     })
     public ResponseEntity<EntityModel<PerfilLealtad>> crearPerfil(@Valid @RequestBody CrearPerfilDTO dto) {
         PerfilLealtad perfil = service.inicializarPerfil(dto);
-        EntityModel<PerfilLealtad> recurso = EntityModel.of(perfil);
-        recurso.add(linkTo(methodOn(LoyaltyController.class).consultarPerfil(perfil.getClienteId())).withSelfRel());
-        recurso.add(linkTo(methodOn(LoyaltyController.class).agregarPuntos(perfil.getClienteId(), null)).withRel("sumar-puntos"));
-        recurso.add(linkTo(methodOn(LoyaltyController.class).restarPuntos(perfil.getClienteId(), null)).withRel("canjear-puntos"));
-        return ResponseEntity.status(HttpStatus.CREATED).body(recurso);
+        return ResponseEntity.status(HttpStatus.CREATED).body(assembler.toModel(perfil));
     }
 
     @PostMapping("/cliente/{clienteId}/sumar")
@@ -83,10 +74,7 @@ public class LoyaltyController {
             @PathVariable Long clienteId,
             @Valid @RequestBody TransaccionPuntosDTO dto) {
         PerfilLealtad perfil = service.sumarPuntos(clienteId, dto);
-        EntityModel<PerfilLealtad> recurso = EntityModel.of(perfil);
-        recurso.add(linkTo(methodOn(LoyaltyController.class).consultarPerfil(clienteId)).withSelfRel());
-        recurso.add(linkTo(methodOn(LoyaltyController.class).restarPuntos(clienteId, null)).withRel("canjear-puntos"));
-        return ResponseEntity.ok(recurso);
+        return ResponseEntity.ok(assembler.toModel(perfil));
     }
 
     @PostMapping("/cliente/{clienteId}/canjear")
@@ -104,9 +92,6 @@ public class LoyaltyController {
             @PathVariable Long clienteId,
             @Valid @RequestBody TransaccionPuntosDTO dto) {
         PerfilLealtad perfil = service.canjearPuntos(clienteId, dto);
-        EntityModel<PerfilLealtad> recurso = EntityModel.of(perfil);
-        recurso.add(linkTo(methodOn(LoyaltyController.class).consultarPerfil(clienteId)).withSelfRel());
-        recurso.add(linkTo(methodOn(LoyaltyController.class).agregarPuntos(clienteId, null)).withRel("sumar-puntos"));
-        return ResponseEntity.ok(recurso);
+        return ResponseEntity.ok(assembler.toModel(perfil));
     }
 }

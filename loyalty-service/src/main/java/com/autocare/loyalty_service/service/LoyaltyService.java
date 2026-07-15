@@ -2,6 +2,8 @@ package com.autocare.loyalty_service.service;
 
 import com.autocare.loyalty_service.dto.CrearPerfilDTO;
 import com.autocare.loyalty_service.dto.TransaccionPuntosDTO;
+import com.autocare.loyalty_service.exception.PerfilNoEncontradoException;
+import com.autocare.loyalty_service.exception.TransaccionInvalidaException;
 import com.autocare.loyalty_service.model.PerfilLealtad;
 import com.autocare.loyalty_service.repository.PerfilLealtadRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,13 +20,13 @@ public class LoyaltyService {
 
     public PerfilLealtad obtenerPerfil(Long clienteId) {
         return repository.findByClienteId(clienteId)
-                .orElseThrow(() -> new RuntimeException("Perfil de lealtad no encontrado para el cliente: " + clienteId));
+                .orElseThrow(() -> new PerfilNoEncontradoException("Perfil de lealtad no encontrado para el cliente: " + clienteId));
     }
 
     public PerfilLealtad inicializarPerfil(CrearPerfilDTO dto) {
         Optional<PerfilLealtad> existente = repository.findByClienteId(dto.clienteId());
         if (existente.isPresent()) {
-            throw new RuntimeException("El cliente ya tiene un perfil de lealtad.");
+            throw new TransaccionInvalidaException("El cliente ya tiene un perfil de lealtad.");
         }
 
         PerfilLealtad nuevoPerfil = new PerfilLealtad(
@@ -51,7 +53,7 @@ public class LoyaltyService {
         PerfilLealtad perfil = obtenerPerfil(clienteId);
         
         if (perfil.getPuntosAcumulados() < dto.cantidadPuntos()) {
-            throw new RuntimeException("Puntos insuficientes para el canje.");
+            throw new TransaccionInvalidaException("Puntos insuficientes para el canje.");
         }
         
         perfil.setPuntosAcumulados(perfil.getPuntosAcumulados() - dto.cantidadPuntos());

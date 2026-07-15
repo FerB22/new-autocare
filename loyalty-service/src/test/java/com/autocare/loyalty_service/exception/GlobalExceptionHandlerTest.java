@@ -20,14 +20,36 @@ class GlobalExceptionHandlerTest {
     private final GlobalExceptionHandler exceptionHandler = new GlobalExceptionHandler();
 
     @Test
-    void handleRuntimeException_DeberiaRetornar404_ConMensaje() {
-        RuntimeException ex = new RuntimeException("Perfil no encontrado");
+    void handlePerfilNoEncontradoException_DeberiaRetornar404_ConMensaje() {
+        PerfilNoEncontradoException ex = new PerfilNoEncontradoException("Perfil no encontrado");
 
-        ResponseEntity<Map<String, Object>> respuesta = exceptionHandler.handleRuntimeException(ex);
+        ResponseEntity<Map<String, Object>> respuesta = exceptionHandler.handlePerfilNoEncontradoException(ex);
 
         assertEquals(HttpStatus.NOT_FOUND, respuesta.getStatusCode());
         assertEquals("Perfil no encontrado", respuesta.getBody().get("message"));
         assertEquals(404, respuesta.getBody().get("status"));
+    }
+
+    @Test
+    void handleTransaccionInvalidaException_DeberiaRetornar400_ConMensaje() {
+        TransaccionInvalidaException ex = new TransaccionInvalidaException("Puntos insuficientes");
+
+        ResponseEntity<Map<String, Object>> respuesta = exceptionHandler.handleTransaccionInvalidaException(ex);
+
+        assertEquals(HttpStatus.BAD_REQUEST, respuesta.getStatusCode());
+        assertEquals("Puntos insuficientes", respuesta.getBody().get("message"));
+        assertEquals(400, respuesta.getBody().get("status"));
+    }
+
+    @Test
+    void handleRuntimeException_DeberiaRetornar500_ConMensaje() {
+        RuntimeException ex = new RuntimeException("Error inesperado");
+
+        ResponseEntity<Map<String, Object>> respuesta = exceptionHandler.handleRuntimeException(ex);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, respuesta.getStatusCode());
+        assertEquals("Error inesperado", respuesta.getBody().get("message"));
+        assertEquals(500, respuesta.getBody().get("status"));
     }
 
     @Test

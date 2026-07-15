@@ -1,12 +1,12 @@
-# Guía de Pruebas con Postman: Garage-Service y Booking-Service
+# Guía de Pruebas con Postman: Garage, Booking y Loyalty Services
 
-Este documento detalla los pasos para realizar las pruebas de integración y validación de los microservicios **Garage-service** (Clientes y Vehículos) y **Booking-service** (Agendamiento de Citas) utilizando Postman o cualquier cliente REST.
+Este documento detalla los pasos para realizar las pruebas de integración y validación de los microservicios **Garage-service** (Clientes y Vehículos), **Booking-service** (Agendamiento de Citas) y **Loyalty-service** (Módulo de Lealtad) utilizando Postman o cualquier cliente REST.
 
 ---
 
 ## 1. Configuración de Entorno y Direcciones Base
 
-Para ejecutar estas pruebas, asegúrate de tener activos el servidor de descubrimiento **Eureka Server**, el **API Gateway** y ambos microservicios.
+Para ejecutar estas pruebas, asegúrate de tener activos el servidor de descubrimiento **Eureka Server**, el **API Gateway** y los microservicios correspondientes.
 
 Puedes realizar las peticiones de dos maneras:
 
@@ -15,14 +15,16 @@ El API Gateway centraliza todas las llamadas en el puerto **8080** y las redirig
 *   **Base URL:** `http://localhost:8080`
 *   **Ruta Garage-service:** `/api/garage/**`
 *   **Ruta Booking-service:** `/api/reservas/**`
+*   **Ruta Loyalty-service:** `/api/lealtad/**`
 
 ### B. Conexión Directa a cada Microservicio
 Si deseas saltarte el Gateway para pruebas unitarias de red:
 *   **Garage-service Base URL:** `http://localhost:8081` (Ruta: `/api/garage/clientes`)
 *   **Booking-service Base URL:** `http://localhost:8085` (Ruta: `/api/reservas/citas`)
+*   **Loyalty-service Base URL:** `http://localhost:8088` (Ruta: `/api/lealtad/cliente`)
 
 > [!NOTE]
-> En los ejemplos siguientes utilizaremos la ruta a través del **API Gateway (`http://localhost:8080`)**. Si pruebas de forma directa, cambia el puerto a `8081` o `8085` según corresponda y mantén el path respectivo.
+> En los ejemplos siguientes utilizaremos la ruta a través del **API Gateway (`http://localhost:8080`)**. Si pruebas de forma directa, cambia el puerto a `8081`, `8085` o `8088` según corresponda y mantén el path respectivo.
 
 ---
 
@@ -151,7 +153,93 @@ Este microservicio se encarga de programar las citas del taller, aplicando regla
 
 ---
 
-## 4. Guía de Códigos de Estado HTTP (El significado de los números)
+## 4. Pruebas para Loyalty-service (Módulo de Lealtad)
+
+Este microservicio se encarga de gestionar los perfiles de lealtad de los clientes, la acumulación de puntos y su canje con control de reglas de negocio (ej. saldo mínimo).
+
+### Paso 4.1: Crear un Perfil de Lealtad (POST)
+*   **Método:** `POST`
+*   **URL:** `http://localhost:8080/api/lealtad/cliente`
+*   **Headers:**
+    *   `Content-Type: application/json`
+*   **Cuerpo (Body -> raw -> JSON):**
+    ```json
+    {
+      "clienteId": 1
+    }
+    ```
+*   **Resultado Esperado:**
+    *   **Código HTTP:** `201 Created`
+    *   **Respuesta JSON:** Retorna el perfil de lealtad creado con `clienteId: 1`, saldo de puntos acumulados inicializado en `0`, nivel `BRONCE` y enlaces HATEOAS (`_links`).
+
+### Paso 4.2: Intentar Crear Perfil con ID de Cliente Inválido (400 Bad Request)
+*   **Método:** `POST`
+*   **URL:** `http://localhost:8080/api/lealtad/cliente`
+*   **Cuerpo (Body - ID inválido):**
+    ```json
+    {
+      "clienteId": -5
+    }
+    ```
+*   **Resultado Esperado:**
+    *   **Código HTTP:** `400 Bad Request`
+    *   **Respuesta JSON:** Mensaje indicando que el ID del cliente debe ser un número positivo.
+
+### Paso 4.3: Sumar Puntos a un Perfil (POST)
+*   **Método:** `POST`
+*   **URL:** `http://localhost:8080/api/lealtad/cliente/1/sumar`
+*   **Headers:**
+    *   `Content-Type: application/json`
+*   **Cuerpo (Body -> raw -> JSON):**
+    ```json
+    {
+      "cantidadPuntos": 150
+    }
+    ```
+*   **Resultado Esperado:**
+    *   **Código HTTP:** `200 OK`
+    *   **Respuesta JSON:** El perfil actualizado mostrando `puntosAcumulados: 150`, nivel calculado (ej. `BRONCE`), y enlaces HATEOAS actualizados.
+
+### Paso 4.4: Canjear Puntos Exitosamente (POST)
+*   **Método:** `POST`
+*   **URL:** `http://localhost:8080/api/lealtad/cliente/1/canjear`
+*   **Headers:**
+    *   `Content-Type: application/json`
+*   **Cuerpo (Body -> raw -> JSON):**
+    ```json
+    {
+      "cantidadPuntos": 50
+    }
+    ```
+*   **Resultado Esperado:**
+    *   **Código HTTP:** `200 OK`
+    *   **Respuesta JSON:** El perfil de lealtad actualizado con `puntosAcumulados: 100`.
+
+### Paso 4.5: Intentar Canjear Más Puntos de los Disponibles (400 Bad Request)
+*   **Método:** `POST`
+*   **URL:** `http://localhost:8080/api/lealtad/cliente/1/canjear`
+*   **Headers:**
+    *   `Content-Type: application/json`
+*   **Cuerpo (Body - Intento de sobregiro):**
+    ```json
+    {
+      "cantidadPuntos": 500
+    }
+    ```
+*   **Resultado Esperado:**
+    *   **Código HTTP:** `400 Bad Request`
+    *   **Respuesta JSON:** Mensaje de error de negocio indicando saldo insuficiente o similar.
+
+### Paso 4.6: Consultar Perfil de Lealtad (GET)
+*   **Método:** `GET`
+*   **URL:** `http://localhost:8080/api/lealtad/cliente/1`
+*   **Resultado Esperado:**
+    *   **Código HTTP:** `200 OK`
+    *   **Respuesta JSON:** El perfil de lealtad completo del cliente con su nivel y saldo actual.
+
+---
+
+## 5. Guía de Códigos de Estado HTTP (El significado de los números)
 
 En la defensa de tu proyecto, los evaluadores querrán ver si entiendes la semántica de la web y del protocolo HTTP. Aquí te explicamos qué significan los números que Postman devuelve:
 
@@ -162,11 +250,11 @@ En la defensa de tu proyecto, los evaluadores querrán ver si entiendes la semá
 | **`204 No Content`** | No Content | La petición se procesó con éxito, pero no es necesario retornar ningún cuerpo en la respuesta. | Típico de operaciones `DELETE` exitosas o actualizaciones donde el cliente no requiere recibir el recurso modificado. |
 | **`400 Bad Request`** | Bad Request | El servidor no pudo procesar la solicitud debido a un error del cliente (sintaxis inválida, parámetros incorrectos, fallas de validación). | Se devuelve cuando los datos enviados no cumplen las restricciones (ej. campos vacíos con `@NotBlank`, fechas pasadas con `@Future`, correos mal formados, o reglas de negocio violadas como colisión de horarios). |
 | **`404 Not Found`** | Not Found | El servidor no puede encontrar el recurso solicitado. | Se utiliza cuando consultas o intentas modificar un recurso por un ID que no existe en la base de datos (ej. un cliente o una cita inexistente). |
-| **`500 Internal Server Error`** | Internal Server Error | El servidor encontró una condición inesperada que le impidió completar la solicitud. | Representa un error del lado del servidor (código Java que falló por un `NullPointerException`, pérdida de conexión con la base de datos, etc.). **En producción no debe ocurrir y se debe capturar.** |
+| **`500 Internal Server Error`** | Internal Server Error | El servidor encontró una condición inesperada que le impidió completar la solicitud. | Representa un error del lado del servidor (código Java que falló por un `NullPointerException`, pérdida de conexión con la base de datos, etc.). **En producción no debe ocurir y se debe capturar.** |
 
 ---
 
-## 5. Tips de Defensa: Cómo justificar tus respuestas HTTP
+## 6. Tips de Defensa: Cómo justificar tus respuestas HTTP
 
 1.  **Diferencia entre 400 (Bad Request) y 500 (Internal Server Error):**
     *   *Defensa:* "Un error de validación (como mandar un correo mal escrito o una fecha en el pasado) es responsabilidad del cliente que envía la petición. Por lo tanto, el protocolo HTTP dicta que debe responderse con la familia `4xx` (específicamente **`400 Bad Request`**). Responder con un **`500`** sería incorrecto porque la aplicación no falló internamente; la aplicación capturó la entrada errónea preventivamente utilizando `@Valid` y respondió de acuerdo al estándar."
