@@ -2,6 +2,8 @@ package com.autocare.garage_service.service;
 
 import com.autocare.garage_service.dto.ClienteRequestDTO;
 import com.autocare.garage_service.dto.VehiculoRequestDTO;
+import com.autocare.garage_service.exception.ClienteNoEncontradoException;
+import com.autocare.garage_service.exception.VehiculoNoEncontradoException;
 import com.autocare.garage_service.model.Cliente;
 import com.autocare.garage_service.model.Vehiculo;
 import com.autocare.garage_service.repository.ClienteRepository;
@@ -43,7 +45,7 @@ public class GarageService {
     @Transactional
     public Vehiculo registrarVehiculoEnGarage(Long clienteId, VehiculoRequestDTO dto) {
         Cliente dueño = clienteRepository.findById(clienteId)
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado en el sistema"));
+                .orElseThrow(() -> new ClienteNoEncontradoException("Cliente no encontrado en el sistema"));
 
         if (vehiculoRepository.findByPatente(dto.patente()).isPresent()) {
             throw new RuntimeException("Este vehículo ya está registrado en la red");
@@ -59,7 +61,7 @@ public class GarageService {
 
     public Cliente obtenerPerfilCompleto(Long clienteId) {
         return clienteRepository.findById(clienteId)
-                .orElseThrow(() -> new RuntimeException("Perfil de cliente no encontrado"));
+                .orElseThrow(() -> new ClienteNoEncontradoException("Perfil de cliente no encontrado"));
     }
 
     public List<Cliente> obtenerTodosLosClientes() {
@@ -71,7 +73,7 @@ public class GarageService {
     @Transactional
     public Cliente actualizarCliente(Long id, ClienteRequestDTO dto) {
         Cliente cliente = clienteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado en el sistema"));
+                .orElseThrow(() -> new ClienteNoEncontradoException("Cliente no encontrado en el sistema"));
 
         clienteRepository.findByDocumentoIdentidad(dto.documentoIdentidad())
                 .ifPresent(existente -> {
@@ -92,7 +94,7 @@ public class GarageService {
     @Transactional
     public void eliminarCliente(Long id) {
         Cliente cliente = clienteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado en el sistema"));
+                .orElseThrow(() -> new ClienteNoEncontradoException("Cliente no encontrado en el sistema"));
 
         clienteRepository.delete(cliente);
     }
@@ -100,10 +102,10 @@ public class GarageService {
     @Transactional
     public Vehiculo actualizarVehiculo(Long clienteId, Long vehiculoId, VehiculoRequestDTO dto) {
         clienteRepository.findById(clienteId)
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado en el sistema"));
+                .orElseThrow(() -> new ClienteNoEncontradoException("Cliente no encontrado en el sistema"));
 
         Vehiculo vehiculo = vehiculoRepository.findById(vehiculoId)
-                .orElseThrow(() -> new RuntimeException("Vehículo no encontrado en el garage"));
+                .orElseThrow(() -> new VehiculoNoEncontradoException("Vehículo no encontrado en el garage"));
 
         vehiculoRepository.findByPatente(dto.patente())
                 .ifPresent(existente -> {
@@ -125,11 +127,16 @@ public class GarageService {
     @Transactional
     public void eliminarVehiculo(Long clienteId, Long vehiculoId) {
         clienteRepository.findById(clienteId)
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado en el sistema"));
+                .orElseThrow(() -> new ClienteNoEncontradoException("Cliente no encontrado en el sistema"));
 
         Vehiculo vehiculo = vehiculoRepository.findById(vehiculoId)
-                .orElseThrow(() -> new RuntimeException("Vehículo no encontrado en el garage"));
+                .orElseThrow(() -> new VehiculoNoEncontradoException("Vehículo no encontrado en el garage"));
 
         vehiculoRepository.delete(vehiculo);
+    }
+
+    public Vehiculo obtenerVehiculoPorId(Long vehiculoId) {
+        return vehiculoRepository.findById(vehiculoId)
+                .orElseThrow(() -> new VehiculoNoEncontradoException("Vehículo no encontrado en el garage"));
     }
 }

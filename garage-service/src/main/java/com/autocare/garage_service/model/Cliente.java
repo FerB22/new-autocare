@@ -33,7 +33,7 @@ public class Cliente {
 
     private String telefono;
 
-    // La fuerza de gravedad: Un cliente tiene MUCHOS vehículos
+    // Relación OneToMany: Un cliente tiene muchos vehículos (con cascada y borrado de huérfanos)
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Vehiculo> vehiculos = new ArrayList<>();
 }
