@@ -99,54 +99,21 @@ Esta sección documenta las reglas de negocio implementadas en la capa `CitaServ
 
 ---
 
-### RN-01: Existencia del Vehículo y Cliente
+### RN-01: Existencia del Cliente y Vehículo
 
-Antes de registrar una cita, el sistema verifica que el vehículo y el cliente existan en la base de datos centralizada consultando al `garage-service`. Si alguno de los identificadores (`Long`) no existe, la cita se rechaza con un error `400`.
-
----
-
-### RN-02: Duración Estándar de una Cita
-
-Cada cita tiene una duración fija de **60 minutos**. Este valor se usa para calcular el rango de tiempo ocupado al validar conflictos en el calendario del taller.
+Antes de registrar una cita, el sistema verifica que el vehículo y el cliente existan consultando dinámicamente al microservicio `garage-service` (a través de `GarageClient`). Si alguno de los identificadores (`Long`) no es válido o no existe, la solicitud se rechaza con un error `400 Bad Request`.
 
 ---
 
-### RN-03: Sin Choques de Horario por Vehículo
+### RN-03: Sin Choques de Horario (Unicidad Temporal)
 
-Un mismo vehículo no puede tener dos citas en estado `CONFIRMADA` o `EJECUTADA` cuyas ventanas de tiempo se solapen. Si se detecta un conflicto, la petición es rechazada.
-
-> **Ejemplo:** Si hay una cita de 10:00 a 11:00, un intento de reserva a las 10:30 será rechazado, pero a las 11:00 será aceptado.
+No pueden existir dos citas en el mismo día y hora exacta en el taller. El sistema valida esto consultando la base de datos local y, si el horario está ocupado, rechaza el agendamiento con una excepción de negocio.
 
 ---
 
-### RN-04: Límite Diario de Citas del Taller
+### RN-04: Límite Diario de Capacidad del Taller
 
-El ecosistema acepta un máximo de **20 citas por día calendario**. Si se alcanza el límite de capacidad operativa, nuevas solicitudes son bloqueadas con una excepción de negocio.
-
----
-
-### RN-05: Transiciones de Estado Válidas
-
-El ciclo de vida de la reserva es estricto. El estado de una cita (`Enum`) solo puede mutar según las siguientes transiciones permitidas:
-
-| Estado actual | Estados permitidos             |
-|---------------|-------------------------------|
-| `AGENDADA`    | `CONFIRMADA`, `CANCELADA`     |
-| `CONFIRMADA`  | `CANCELADA`, `EJECUTADA`      |
-| `CANCELADA`   | *(ninguno — estado final)*    |
-| `EJECUTADA`   | *(ninguno — estado final)*    |
-
----
-
-### RN-06: Creación Automática de Orden de Trabajo
-
-Cuando el vehículo llega físicamente y la cita pasa a estado `EJECUTADA`, el sistema se comunica con el `workshop-service` para abrir automáticamente una **Orden de Trabajo** en estado `RECEPCIONADO`, transfiriendo el `vehiculoId` y el motivo de la visita.
-
----
-
-### RN-07: Inmutabilidad Temporal (Citas Futuras)
-
-No se permiten agendar citas con fecha y hora en el pasado. Esta regla se aplica en la capa de entrada mediante la validación `@Future` en los records `CitaRequestDTO`.
+Para garantizar la calidad de la atención y evitar la sobrecarga del taller, el sistema impone un límite de **20 citas máximo por día calendario**. Superado este valor, cualquier intento de agendamiento para esa fecha será rechazado con un error de negocio.
 
 ---
 
@@ -154,137 +121,74 @@ No se permiten agendar citas con fecha y hora en el pasado. Esta regla se aplica
 
 | Escenario               | Input esperado                              | Respuesta HTTP esperada                                                 |
 |-------------------------|---------------------------------------------|-------------------------------------------------------------------------|
-| Entidad inexistente     | `vehiculoId` no registrado en `garage`      | `400 Bad Request` + `"El vehículo no existe en el sistema"`             |
-| Choque temporal         | Cita en rango ocupado                       | `400 Bad Request` + `"El vehículo ya tiene una cita en ese horario"`    |
-| Saturación operativa    | 21ª cita en el mismo día                    | `400 Bad Request` + `"Se alcanzó el máximo de citas permitidas para este día"` |
-| Alteración de flujo     | `CANCELADA → CONFIRMADA`                    | `400 Bad Request` + `"Transición de estado inválida"`                   |
-| Viaje en el tiempo      | `fechaHora < ahora`                         | `400 Bad Request` (Vía Jakarta Validation)                              |
-| Recepción exitosa       | `CONFIRMADA → EJECUTADA`                    | `200 OK` + Orden de trabajo autogenerada en `workshop-service`          |
+| Cliente inexistente     | `clienteId` no registrado en `garage`       | `400 Bad Request` + `"El cliente no existe en el sistema."`             |
+| Vehículo inexistente    | `vehiculoId` no registrado en `garage`      | `400 Bad Request` + `"El vehículo no existe en el sistema."`            |
+| Choque temporal         | Cita en día y hora ocupados                 | `400 Bad Request` (HorarioOcupadoException) + `"Ya existe una cita agendada en ese horario."` |
+| Saturación operativa    | 21ª cita en el mismo día                    | `400 Bad Request` (HorarioOcupadoException) + `"Límite de 20 citas diarias alcanzado."` |
 
 ---
 
 ## 🧪 Plan de Pruebas Unitarias
 
-El plan de pruebas completo y detallado se encuentra en el archivo dedicado **[TESTING_PLAN.md](./TESTING_PLAN.md)**. Esta sección resume los puntos clave de la estrategia adoptada por el equipo.
+Esta sección resume la estrategia de pruebas unitarias adoptada por el equipo.
 
 ### Alcance y Enfoque
 
-Las pruebas unitarias cubren la capa de servicio (`CitaService`) del módulo `booking-service`, que concentra la mayor densidad de reglas de negocio críticas del sistema. Las dependencias externas (repositorio JPA y cliente WebClient hacia `garage-service`) son reemplazadas por **dobles de prueba (mocks)** usando **Mockito**, de modo que cada test valide una sola unidad de lógica en completo aislamiento.
+Las pruebas unitarias cubren la capa de servicio (`CitaService`) del módulo `booking-service` en su totalidad. Las dependencias externas (repositorio JPA y cliente HTTP hacia `garage-service`) son simuladas utilizando **Mockito para asegurar el aislamiento completo del test de la lógica de negocio.
 
 ### Reglas Críticas Bajo Cobertura
 
-Las siguientes reglas de negocio son consideradas **críticas** y poseen al menos un caso de prueba positivo y uno negativo:
+Todas las pruebas unitarias y de integración están contenidas en la clase de prueba única [CitaServiceTest.java](file:///c:/Users/barra/OneDrive/Documentos/new-autocare-main/booking-service/src/test/java/com/autocare/booking_service/service/CitaServiceTest.java):
 
-| Código | Regla                                          | Clase de prueba                  |
-|--------|------------------------------------------------|----------------------------------|
-| RN-01  | Existencia de vehículo (`verificarVehiculo`)   | `CitaServiceRN01Test`            |
-| RN-03  | Sin choques de horario (`existsByFechaHora…`)  | `CitaServiceRN03Test`            |
-| RN-04  | Un vehículo, una cita CONFIRMADA activa        | `CitaServiceRN04Test`            |
-| RN-05  | Cita EJECUTADA no puede cambiar de estado      | `CitaServiceRN05Test`            |
-| RN-06  | Cita CANCELADA no puede reactivarse            | `CitaServiceRN06Test`            |
-| RN-07  | Anticipación mínima de 24 horas                | `CitaServiceRN07Test`            |
-| RN-08  | No se agenda en fin de semana                  | `CitaServiceRN08Test`            |
+| Código | Regla                                          | Método de prueba (en `CitaServiceTest`) |
+|--------|------------------------------------------------|-----------------------------------------|
+| RN-01  | Existencia de cliente y vehículo               | `agendarCita_LanzaExcepcion_ClienteNoExiste`, `agendarCita_LanzaExcepcion_VehiculoNoExiste` |
+| RN-03  | Sin choques de horario                         | `agendarCita_LanzaExcepcion_PorChoqueDeHorario` |
+| RN-04  | Límite diario de 20 citas                      | `agendarCita_LanzaExcepcion_PorLimiteDiario`, `agendarCita_Exito_ConExactamente19CitasDelDia` |
+
+---
 
 ### Estructura de los Tests: Given-When-Then
 
-Todos los métodos de prueba siguen la convención **Given-When-Then** (Dado-Cuando-Entonces), que estructura cada test en tres bloques claros:
+Los métodos de prueba siguen la convención **Given-When-Then** (Dado-Cuando-Entonces). A continuación se muestran ejemplos basados directamente en la implementación real de [CitaServiceTest.java](file:///c:/Users/barra/OneDrive/Documentos/new-autocare-main/booking-service/src/test/java/com/autocare/booking_service/service/CitaServiceTest.java):
 
-- **Given** — el estado inicial del sistema antes de que ocurra algo.
-- **When** — la acción que se ejecuta y que queremos probar.
-- **Then** — el resultado que esperamos observar.
-
-Los siguientes ejemplos están escritos directamente a partir de la lógica real de `CitaService.java`:
-
----
-
-#### Ejemplo 1 — RN-04: Un vehículo no puede tener más de una cita CONFIRMADA activa
-
-Este test cubre la regla implementada en `CitaService.guardar()` mediante
-`citaRepository.countByIdVehiculoAndEstado(...)`:
-
+#### Ejemplo 1 — RN-04: Límite diario de 20 citas
 ```java
 @Test
-@DisplayName("RN-04: Debe rechazar la cita cuando el vehículo ya tiene una cita CONFIRMADA activa")
-void debeLanzarExcepcion_cuandoVehiculoYaTieneCitaConfirmada() {
+@DisplayName("Validación RN-04: Rechazar agendamiento si supera 20 citas diarias")
+void agendarCita_LanzaExcepcion_PorLimiteDiario() {
+    // GIVEN — El cliente y vehículo son válidos, pero el taller ya tiene 20 citas registradas ese día
+    when(garageClient.existeCliente(anyLong())).thenReturn(true);
+    when(garageClient.existeVehiculo(anyLong())).thenReturn(true);
+    when(repository.countByFecha(citaRequestValida.fechaHora().toLocalDate()))
+            .thenReturn(20L);
 
-    // GIVEN — el repositorio simula que el vehículo ya tiene 1 cita confirmada
-    Cita nuevaCita = new Cita();
-    nuevaCita.setIdVehiculo("VEH-001");
-    nuevaCita.setIdCliente("CLI-001");
-    nuevaCita.setFechaHora(LocalDateTime.now().plusDays(2));
+    // WHEN & THEN — Se intenta agendar la cita y se espera una excepción de negocio
+    RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        citaService.agendarCita(citaRequestValida);
+    });
 
-    when(citaRepository.countByIdVehiculoAndEstado("VEH-001", Cita.EstadoCita.CONFIRMADA))
-        .thenReturn(1L);
-
-    // WHEN — se intenta guardar la nueva cita
-    ThrowingCallable accion = () -> citaService.guardar(nuevaCita);
-
-    // THEN — se espera una excepción 409 CONFLICT con el mensaje correcto
-    assertThatThrownBy(accion)
-        .isInstanceOf(ResponseStatusException.class)
-        .hasMessageContaining("El vehículo ya tiene una cita CONFIRMADA pendiente");
+    assertTrue(exception.getMessage().contains("Límite de 20 citas diarias alcanzado"));
+    verify(repository, never()).save(any(Cita.class));
 }
 ```
 
----
-
-#### Ejemplo 2 — RN-05: Una cita EJECUTADA no puede cambiar de estado
-
-Este test cubre la guarda de `cambiarEstado()` en `CitaService`,
-que lanza `RuntimeException` si la cita ya está en estado `EJECUTADA`:
-
+#### Ejemplo 2 — RN-01: Rechazar agendamiento si el vehículo no existe
 ```java
 @Test
-@DisplayName("RN-05: Debe rechazar el cambio de estado de una cita ya EJECUTADA")
-void debeLanzarExcepcion_cuandoCitaYaFueEjecutada() {
+@DisplayName("Validación RN-01: Rechazar agendamiento si el vehículo no existe")
+void agendarCita_LanzaExcepcion_VehiculoNoExiste() {
+    // GIVEN — El cliente existe pero el vehículo no existe en el garage-service
+    when(garageClient.existeCliente(anyLong())).thenReturn(true);
+    when(garageClient.existeVehiculo(anyLong())).thenReturn(false);
 
-    // GIVEN — la cita existe en BD con estado EJECUTADA
-    Cita citaEjecutada = new Cita();
-    citaEjecutada.setId("CITA-42");
-    citaEjecutada.setEstado(Cita.EstadoCita.EJECUTADA);
+    // WHEN & THEN — Se espera una excepción 400 Bad Request
+    ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+        citaService.agendarCita(citaRequestValida);
+    });
 
-    when(citaRepository.findById("CITA-42"))
-        .thenReturn(Optional.of(citaEjecutada));
-
-    // WHEN — se intenta cambiar el estado a CANCELADA
-    ThrowingCallable accion = () -> citaService.cambiarEstado("CITA-42", Cita.EstadoCita.CANCELADA);
-
-    // THEN — se espera RuntimeException con el mensaje de negocio
-    assertThatThrownBy(accion)
-        .isInstanceOf(RuntimeException.class)
-        .hasMessageContaining("La cita ya fue EJECUTADA y no puede cambiar de estado");
-}
-```
-
----
-
-#### Ejemplo 3 — RN-08: No se puede agendar en fin de semana
-
-Este test cubre el bloque que extrae `DayOfWeek` en `CitaService.guardar()`
-y lanza `400 BAD_REQUEST` si el día es sábado o domingo:
-
-```java
-@Test
-@DisplayName("RN-08: Debe rechazar una cita agendada en fin de semana")
-void debeLanzarExcepcion_cuandoFechaEsFinDeSemana() {
-
-    // GIVEN — la cita tiene fecha en sábado con más de 24 horas de anticipación
-    LocalDateTime sabado = LocalDateTime.now()
-        .with(java.time.DayOfWeek.SATURDAY)
-        .plusWeeks(1);
-
-    Cita cita = new Cita();
-    cita.setIdVehiculo("VEH-002");
-    cita.setIdCliente("CLI-002");
-    cita.setFechaHora(sabado);
-
-    // WHEN — se intenta guardar la cita en fin de semana
-    ThrowingCallable accion = () -> citaService.guardar(cita);
-
-    // THEN — se espera 400 BAD_REQUEST con mensaje de días hábiles
-    assertThatThrownBy(accion)
-        .isInstanceOf(ResponseStatusException.class)
-        .hasMessageContaining("no opera los fines de semana");
+    assertTrue(exception.getMessage().contains("El vehículo no existe en el sistema"));
+    verify(repository, never()).save(any(Cita.class));
 }
 ```
 
